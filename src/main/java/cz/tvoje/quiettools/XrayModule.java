@@ -1,0 +1,196 @@
+package cz.tvoje.quiettools;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class XrayModule {
+
+    private static final Set<Block> targetBlocks = new HashSet<>();
+    // Mapování bloků na jejich ID pro barvu
+    private static final Map<Block, String> blockOreIds = new HashMap<>();
+
+    static {
+        updateTargetBlocks();
+    }
+
+    public static void updateTargetBlocks() {
+        targetBlocks.clear();
+        blockOreIds.clear();
+
+        // Vanilla ores
+        if (ModSettings.xrayShowDiamond) {
+            addOre(Blocks.DIAMOND_ORE, "diamond");
+            addOre(Blocks.DEEPSLATE_DIAMOND_ORE, "diamond");
+        }
+        if (ModSettings.xrayShowEmerald) {
+            addOre(Blocks.EMERALD_ORE, "emerald");
+            addOre(Blocks.DEEPSLATE_EMERALD_ORE, "emerald");
+        }
+        if (ModSettings.xrayShowAncientDebris) {
+            addOre(Blocks.ANCIENT_DEBRIS, "ancient_debris");
+        }
+        if (ModSettings.xrayShowGold) {
+            addOre(Blocks.GOLD_ORE, "gold");
+            addOre(Blocks.DEEPSLATE_GOLD_ORE, "gold");
+        }
+        if (ModSettings.xrayShowCopper) {
+            addOre(Blocks.COPPER_ORE, "copper");
+            addOre(Blocks.DEEPSLATE_COPPER_ORE, "copper");
+        }
+        if (ModSettings.xrayShowIron) {
+            addOre(Blocks.IRON_ORE, "iron");
+            addOre(Blocks.DEEPSLATE_IRON_ORE, "iron");
+        }
+        if (ModSettings.xrayShowLapis) {
+            addOre(Blocks.LAPIS_ORE, "lapis");
+            addOre(Blocks.DEEPSLATE_LAPIS_ORE, "lapis");
+        }
+        if (ModSettings.xrayShowRedstone) {
+            addOre(Blocks.REDSTONE_ORE, "redstone");
+            addOre(Blocks.DEEPSLATE_REDSTONE_ORE, "redstone");
+        }
+        if (ModSettings.xrayShowCoal) {
+            addOre(Blocks.COAL_ORE, "coal");
+            addOre(Blocks.DEEPSLATE_COAL_ORE, "coal");
+        }
+        if (ModSettings.xrayShowKyber) {
+            addBlockIfExists("cobblemon", "kyber_ore", "kyber");
+        }
+
+        addMythicMetalsOres();
+    }
+
+    private static void addOre(Block block, String oreId) {
+        targetBlocks.add(block);
+        blockOreIds.put(block, oreId);
+    }
+
+    private static void addMythicMetalsOres() {
+        try {
+            if (ModSettings.xrayShowOrichalcum) addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
+            if (ModSettings.xrayShowKalimite) addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
+            if (ModSettings.xrayShowMalachite) addBlockIfExists("mythicmetals", "malachite_ore", "malachite");
+            if (ModSettings.xrayShowTitanium) addBlockIfExists("mythicmetals", "titanium_ore", "titanium");
+            if (ModSettings.xrayShowAdamantite) addBlockIfExists("mythicmetals", "adamantite_ore", "adamantite");
+            if (ModSettings.xrayShowMithril) addBlockIfExists("mythicmetals", "mithril_ore", "mithril");
+            if (ModSettings.xrayShowPlatinum) addBlockIfExists("mythicmetals", "platinum_ore", "platinum");
+            if (ModSettings.xrayShowSilver) addBlockIfExists("mythicmetals", "silver_ore", "silver");
+            if (ModSettings.xrayShowBanglum) addBlockIfExists("mythicmetals", "banglum_ore", "banglum");
+            if (ModSettings.xrayShowRunite) addBlockIfExists("mythicmetals", "runite_ore", "runite");
+        } catch (Exception e) {
+            // Mythic Metals není nainstalovaný
+        }
+    }
+
+    private static void addBlockIfExists(String namespace, String blockName, String oreId) {
+        try {
+            Identifier id = new Identifier(namespace, blockName);
+            Block block = Registries.BLOCK.get(id);
+            if (block != null && block != Blocks.AIR) {
+                addOre(block, oreId);
+            }
+        } catch (Exception e) {
+            // Blok neexistuje
+        }
+    }
+
+    public static void scanAndRender(WorldRenderContext context) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player == null || client.world == null || !ModSettings.xrayEnabled) {
+            return;
+        }
+
+        World world = client.world;
+        BlockPos playerPos = client.player.getBlockPos();
+        int radius = Math.min(ModSettings.xrayRadius, 64); // Max 64 bloků aby nebyla lag
+
+        // Scanuj VŠECHNY blíž k hráči (opraveno: += 1 místo += 2)
+        for (int x = playerPos.getX() - radius; x <= playerPos.getX() + radius; x++) {
+            for (int y = playerPos.getY() - radius; y <= playerPos.getY() + radius; y++) {
+                for (int z = playerPos.getZ() - radius; z <= playerPos.getZ() + radius; z++) {
+                    BlockPos blockPos = new BlockPos(x, y, z);
+                    Block block = world.getBlockState(blockPos).getBlock();
+
+                    if (targetBlocks.contains(block)) {
+                        renderOreBox(context, blockPos, block);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void renderOreBox(WorldRenderContext context, BlockPos pos, Block block) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Vec3d cameraPos = context.camera().getPos();
+
+        double x = pos.getX() - cameraPos.x;
+        double y = pos.getY() - cameraPos.y;
+        double z = pos.getZ() - cameraPos.z;
+
+        Box box = new Box(x, y, z, x + 1, y + 1, z + 1);
+        int color = getOreColor(block);
+
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        float rf = r / 255f;
+        float gf = g / 255f;
+        float bf = b / 255f;
+
+        VertexConsumerProvider.Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
+        VertexConsumer buffer = consumers.getBuffer(RenderLayer.getLines());
+
+        WorldRenderer.drawBox(context.matrixStack(), buffer, box, rf, gf, bf, 1.0f);
+        consumers.draw();
+    }
+
+    private static int getOreColor(Block block) {
+        String oreId = blockOreIds.getOrDefault(block, "");
+
+        // Vanilla ores
+        if (oreId.equals("diamond")) return rgb(ModSettings.xrayDiamondR, ModSettings.xrayDiamondG, ModSettings.xrayDiamondB);
+        if (oreId.equals("emerald")) return rgb(ModSettings.xrayEmeraldR, ModSettings.xrayEmeraldG, ModSettings.xrayEmeraldB);
+        if (oreId.equals("ancient_debris")) return rgb(ModSettings.xrayAncientDebrisR, ModSettings.xrayAncientDebrisG, ModSettings.xrayAncientDebrisB);
+        if (oreId.equals("gold")) return rgb(ModSettings.xrayGoldR, ModSettings.xrayGoldG, ModSettings.xrayGoldB);
+        if (oreId.equals("copper")) return rgb(ModSettings.xrayCopperR, ModSettings.xrayCopperG, ModSettings.xrayCopperB);
+        if (oreId.equals("iron")) return rgb(ModSettings.xrayIronR, ModSettings.xrayIronG, ModSettings.xrayIronB);
+        if (oreId.equals("lapis")) return rgb(ModSettings.xrayLapisR, ModSettings.xrayLapisG, ModSettings.xrayLapisB);
+        if (oreId.equals("redstone")) return rgb(ModSettings.xrayRedstoneR, ModSettings.xrayRedstoneG, ModSettings.xrayRedstoneB);
+        if (oreId.equals("coal")) return rgb(ModSettings.xrayCoalR, ModSettings.xrayCoalG, ModSettings.xrayCoalB);
+        if (oreId.equals("kyber")) return rgb(ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
+
+        // Mythic Metals
+        if (oreId.equals("orichalcum")) return 0xFF00FF;
+        if (oreId.equals("kalimite")) return 0x00FFFF;
+        if (oreId.equals("malachite")) return 0x00AA00;
+        if (oreId.equals("titanium")) return 0xDDDDDD;
+        if (oreId.equals("adamantite")) return 0x8B0000;
+        if (oreId.equals("mithril")) return 0x87CEEB;
+        if (oreId.equals("platinum")) return 0xE5E4E2;
+        if (oreId.equals("silver")) return 0xC0C0C0;
+        if (oreId.equals("banglum")) return 0xFFB347;
+        if (oreId.equals("runite")) return 0x800080;
+
+        return 0xFFFFFF;
+    }
+
+    private static int rgb(int r, int g, int b) {
+        return (0xFF << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+    }
+}

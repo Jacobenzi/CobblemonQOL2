@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "betterthirdperson",
+  "version": "1.9.0",
+  "name": "Better Third Person",
+  "description": "Adds independent camera rotation for third-person view",
+  "authors": ["Socolio"],
+  "environment": "client",
+  "entrypoints": {
+    "client": ["cz.tvoje.quiettools.QuietTools"]
+  },
+  "depends": {
+    "fabricloader": ">=0.17.2",
+    "fabric-api": "*",
+    "cobblemon": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}
