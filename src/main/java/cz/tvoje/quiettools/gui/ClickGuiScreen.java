@@ -171,6 +171,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xraySilverButton;
     private ModuleButton xrayBanglumButton;
     private ModuleButton xrayRuniteButton;
+    private ModuleButton xrayCarmotButton;
 
     private ColorPickerComponent currentColorPicker;
 
@@ -776,6 +777,20 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayRuniteB = value
                 ));
 
+        xrayCarmotButton = new ModuleButton(0, 0, componentWidth, 22, "Carmot",
+                () -> ModSettings.xrayShowCarmot,
+                v -> {
+                    ModSettings.xrayShowCarmot = v;
+                    XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Carmot",
+                        () -> ModSettings.xrayCarmotR, () -> ModSettings.xrayCarmotG, () -> ModSettings.xrayCarmotB,
+                        value -> ModSettings.xrayCarmotR = value,
+                        value -> ModSettings.xrayCarmotG = value,
+                        value -> ModSettings.xrayCarmotB = value
+                ));
+
         // =========================================================
         // CUSTOM POKEMON ESP COMPONENTS
         // =========================================================
@@ -1200,6 +1215,11 @@ public class ClickGuiScreen extends Screen {
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
             xrayY += 24;
 
+            xrayCarmotButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayCarmotButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayCarmotR, ModSettings.xrayCarmotG, ModSettings.xrayCarmotB);
+            xrayY += 24;
+
             if (currentColorPicker != null) {
                 currentColorPicker.setPosition(panelX + panelWidth - 185, panelY + 36);
                 currentColorPicker.render(context, mouseX, mouseY);
@@ -1459,6 +1479,7 @@ public class ClickGuiScreen extends Screen {
             xraySilverButton.mouseClicked(mouseX, mouseY, button);
             xrayBanglumButton.mouseClicked(mouseX, mouseY, button);
             xrayRuniteButton.mouseClicked(mouseX, mouseY, button);
+            xrayCarmotButton.mouseClicked(mouseX, mouseY, button);
         }
 
         return super.mouseClicked(mouseX, mouseY, button);

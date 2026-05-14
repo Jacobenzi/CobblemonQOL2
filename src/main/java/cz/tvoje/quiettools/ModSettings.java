@@ -112,6 +112,7 @@ public class ModSettings {
     public static boolean xrayShowSilver = false;
     public static boolean xrayShowBanglum = false;
     public static boolean xrayShowRunite = false;
+    public static boolean xrayShowCarmot = false;
 
     // Mythic Metals ore colors
     public static int xrayKyberR = 0;
@@ -157,6 +158,10 @@ public class ModSettings {
     public static int xrayRuniteR = 128;
     public static int xrayRuniteG = 0;
     public static int xrayRuniteB = 128;
+
+    public static int xrayCarmotR = 230;
+    public static int xrayCarmotG = 0;
+    public static int xrayCarmotB = 90;
 
     // =========================================================
     // FULLBRIGHT SETTINGS

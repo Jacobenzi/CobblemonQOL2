@@ -79,17 +79,65 @@ public class XrayModule {
 
     private static void addMythicMetalsOres() {
         try {
-            if (ModSettings.xrayShowKyber) addBlockIfExists("mythicmetals", "kyber_ore", "kyber");
-            if (ModSettings.xrayShowOrichalcum) addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
-            if (ModSettings.xrayShowKalimite) addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
-            if (ModSettings.xrayShowMalachite) addBlockIfExists("mythicmetals", "malachite_ore", "malachite");
-            if (ModSettings.xrayShowTitanium) addBlockIfExists("mythicmetals", "titanium_ore", "titanium");
-            if (ModSettings.xrayShowAdamantite) addBlockIfExists("mythicmetals", "adamantite_ore", "adamantite");
-            if (ModSettings.xrayShowMithril) addBlockIfExists("mythicmetals", "mithril_ore", "mithril");
-            if (ModSettings.xrayShowPlatinum) addBlockIfExists("mythicmetals", "platinum_ore", "platinum");
-            if (ModSettings.xrayShowSilver) addBlockIfExists("mythicmetals", "silver_ore", "silver");
-            if (ModSettings.xrayShowBanglum) addBlockIfExists("mythicmetals", "banglum_ore", "banglum");
-            if (ModSettings.xrayShowRunite) addBlockIfExists("mythicmetals", "runite_ore", "runite");
+            if (ModSettings.xrayShowKyber) {
+                addBlockIfExists("mythicmetals", "kyber_ore", "kyber");
+                addBlockIfExists("mythicmetals", "deepslate_kyber_ore", "kyber");
+            }
+
+            if (ModSettings.xrayShowOrichalcum) {
+                addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
+                addBlockIfExists("mythicmetals", "deepslate_orichalcum_ore", "orichalcum");
+            }
+
+            if (ModSettings.xrayShowKalimite) {
+                addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
+                addBlockIfExists("mythicmetals", "deepslate_kalimite_ore", "kalimite");
+            }
+
+            if (ModSettings.xrayShowMalachite) {
+                addBlockIfExists("mythicmetals", "malachite_ore", "malachite");
+                addBlockIfExists("mythicmetals", "deepslate_malachite_ore", "malachite");
+            }
+
+            if (ModSettings.xrayShowTitanium) {
+                addBlockIfExists("mythicmetals", "titanium_ore", "titanium");
+                addBlockIfExists("mythicmetals", "deepslate_titanium_ore", "titanium");
+            }
+
+            if (ModSettings.xrayShowAdamantite) {
+                addBlockIfExists("mythicmetals", "adamantite_ore", "adamantite");
+                addBlockIfExists("mythicmetals", "deepslate_adamantite_ore", "adamantite");
+            }
+
+            if (ModSettings.xrayShowMithril) {
+                addBlockIfExists("mythicmetals", "mithril_ore", "mithril");
+                addBlockIfExists("mythicmetals", "deepslate_mithril_ore", "mithril");
+            }
+
+            if (ModSettings.xrayShowPlatinum) {
+                addBlockIfExists("mythicmetals", "platinum_ore", "platinum");
+                addBlockIfExists("mythicmetals", "deepslate_platinum_ore", "platinum");
+            }
+
+            if (ModSettings.xrayShowSilver) {
+                addBlockIfExists("mythicmetals", "silver_ore", "silver");
+                addBlockIfExists("mythicmetals", "deepslate_silver_ore", "silver");
+            }
+
+            if (ModSettings.xrayShowBanglum) {
+                addBlockIfExists("mythicmetals", "banglum_ore", "banglum");
+                addBlockIfExists("mythicmetals", "deepslate_banglum_ore", "banglum");
+            }
+
+            if (ModSettings.xrayShowRunite) {
+                addBlockIfExists("mythicmetals", "runite_ore", "runite");
+                addBlockIfExists("mythicmetals", "deepslate_runite_ore", "runite");
+            }
+
+            if (ModSettings.xrayShowCarmot) {
+                addBlockIfExists("mythicmetals", "carmot_ore", "carmot");
+                addBlockIfExists("mythicmetals", "deepslate_carmot_ore", "carmot");
+            }
         } catch (Exception e) {
             // Mythic Metals není nainstalovaný
         }
