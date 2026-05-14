@@ -9,6 +9,7 @@ import cz.tvoje.quiettools.gui.components.ColorPickerComponent;
 import cz.tvoje.quiettools.gui.components.ModuleButton;
 import cz.tvoje.quiettools.gui.components.SliderComponent;
 import cz.tvoje.quiettools.gui.render.RenderUtils;
+import cz.tvoje.quiettools.gui.components.TextInputComponent;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -95,6 +96,16 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton ivButton;
     private ModuleButton autoJumpButton;
     private SliderComponent espRadiusSlider;
+
+    // =========================================================
+    // CUSTOM POKEMON ESP COMPONENTS
+    // =========================================================
+    private ModuleButton customPokemonButton;
+    private TextInputComponent customPokemonInput;
+    private SliderComponent customPokemonRadiusSlider;
+    private SliderComponent customPokemonRSlider;
+    private SliderComponent customPokemonGSlider;
+    private SliderComponent customPokemonBSlider;
 
     private ModuleButton apricornButton;
     private ModuleButton berryButton;
@@ -764,6 +775,58 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayRuniteG = value,
                         value -> ModSettings.xrayRuniteB = value
                 ));
+
+        // =========================================================
+        // CUSTOM POKEMON ESP COMPONENTS
+        // =========================================================
+
+        customPokemonButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                panelY + 150,
+                componentWidth,
+                22,
+                "Custom Pokémon",
+                () -> ModSettings.customPokemonEspEnabled,
+                value -> ModSettings.customPokemonEspEnabled = value
+        );
+
+        customPokemonInput = new TextInputComponent(
+                panelX + sidebarWidth + 15,
+                panelY + 180,
+                componentWidth,
+                20,
+                "Pokémon Name",
+                "Pikachu...",
+                value -> ModSettings.customPokemonName = value
+        );
+        customPokemonInput.setValue(ModSettings.customPokemonName);
+
+        customPokemonRadiusSlider = new SliderComponent(
+                panelX + sidebarWidth + 15,
+                panelY + 210,
+                componentWidth,
+                18,
+                "Radius",
+                16,
+                256,
+                ModSettings.customPokemonRadius,
+                value -> ModSettings.customPokemonRadius = value.intValue()
+        );
+
+        customPokemonRSlider = new SliderComponent(
+                panelX + sidebarWidth + 15, panelY + 240, componentWidth, 18, "Custom R",
+                0, 255, ModSettings.customPokemonR, value -> ModSettings.customPokemonR = value.intValue()
+        );
+
+        customPokemonGSlider = new SliderComponent(
+                panelX + sidebarWidth + 15, panelY + 270, componentWidth, 18, "Custom G",
+                0, 255, ModSettings.customPokemonG, value -> ModSettings.customPokemonG = value.intValue()
+        );
+
+        customPokemonBSlider = new SliderComponent(
+                panelX + sidebarWidth + 15, panelY + 300, componentWidth, 18, "Custom B",
+                0, 255, ModSettings.customPokemonB, value -> ModSettings.customPokemonB = value.intValue()
+        );
     }
 
     @Override
@@ -857,10 +920,31 @@ public class ClickGuiScreen extends Screen {
             ivButton.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 96 - scrollOffset));
             espRadiusSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 136 - scrollOffset));
 
+            // CUSTOM POKEMON ESP
+            customPokemonButton.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 176 - scrollOffset));
+            customPokemonInput.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 204 - scrollOffset));
+            customPokemonRadiusSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 232 - scrollOffset));
+            customPokemonRSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 262 - scrollOffset));
+            customPokemonGSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 290 - scrollOffset));
+            customPokemonBSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + 318 - scrollOffset));
+
             blisseyButton.render(context, mouseX, mouseY);
             shinyButton.render(context, mouseX, mouseY);
             ivButton.render(context, mouseX, mouseY);
             espRadiusSlider.render(context, mouseX, mouseY);
+
+            // CUSTOM POKEMON RENDER
+            customPokemonButton.render(context, mouseX, mouseY);
+            customPokemonInput.render(context, mouseX, mouseY);
+            customPokemonRadiusSlider.render(context, mouseX, mouseY);
+            customPokemonRSlider.render(context, mouseX, mouseY);
+            customPokemonGSlider.render(context, mouseX, mouseY);
+            customPokemonBSlider.render(context, mouseX, mouseY);
+
+            // VALIDATION - zobraz status pokémona
+            int statusColor = ModSettings.customPokemonFound ? 0xFF00FF00 : 0xFFFF0000;
+            String status = ModSettings.customPokemonFound ? "✓ Found" : "✗ Not Found";
+            context.drawText(textRenderer, status, panelX + sidebarWidth + 15 + componentWidth - 60, (int)(panelY + 207 - scrollOffset), statusColor, false);
         }
 
         if (selectedCategory == Category.FARMING) {
@@ -1286,6 +1370,14 @@ public class ClickGuiScreen extends Screen {
             shinyButton.mouseClicked(mouseX, mouseY, button);
             ivButton.mouseClicked(mouseX, mouseY, button);
             espRadiusSlider.mouseClicked(mouseX, mouseY);
+
+                // CUSTOM POKEMON
+                customPokemonButton.mouseClicked(mouseX, mouseY, button);
+                customPokemonInput.mouseClicked(mouseX, mouseY, button);
+                customPokemonRadiusSlider.mouseClicked(mouseX, mouseY);
+                customPokemonRSlider.mouseClicked(mouseX, mouseY);
+                customPokemonGSlider.mouseClicked(mouseX, mouseY);
+                customPokemonBSlider.mouseClicked(mouseX, mouseY);
         }
 
         if (selectedCategory == Category.FARMING) {
@@ -1382,6 +1474,10 @@ public class ClickGuiScreen extends Screen {
 
         if (selectedCategory == Category.ESP) {
             espRadiusSlider.mouseReleased();
+            customPokemonRadiusSlider.mouseReleased();
+            customPokemonRSlider.mouseReleased();
+            customPokemonGSlider.mouseReleased();
+            customPokemonBSlider.mouseReleased();
         }
 
         if (selectedCategory == Category.FARMING) {
@@ -1426,5 +1522,23 @@ public class ClickGuiScreen extends Screen {
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        if (selectedCategory == Category.ESP && customPokemonInput != null) {
+            return customPokemonInput.charTyped(chr, modifiers);
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (selectedCategory == Category.ESP && customPokemonInput != null) {
+            if (customPokemonInput.keyPressed(keyCode, scanCode, modifiers)) {
+                return true;
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

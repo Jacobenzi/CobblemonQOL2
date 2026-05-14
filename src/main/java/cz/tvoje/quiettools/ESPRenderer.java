@@ -93,6 +93,43 @@ public class ESPRenderer {
         }
 
         // =========================================================
+        // CUSTOM POKEMON ESP
+        // =========================================================
+
+        if (ModSettings.customPokemonEspEnabled && !ModSettings.customPokemonName.isEmpty()) {
+
+            ModSettings.customPokemonFound = false;
+
+            for (PokemonEntity pokemonEntity :
+                    client.world.getEntitiesByClass(
+                            PokemonEntity.class,
+                            client.player.getBoundingBox().expand(ModSettings.customPokemonRadius),
+                            entity -> true
+                    )) {
+
+                Pokemon pokemon = pokemonEntity.getPokemon();
+
+                if (pokemon == null || pokemon.getSpecies() == null || pokemon.getSpecies().getName() == null) continue;
+
+                String pokemonName = pokemon.getSpecies().getName().toLowerCase();
+                String searchName = ModSettings.customPokemonName.toLowerCase().trim();
+
+                if (pokemonName.contains(searchName)) {
+                    ModSettings.customPokemonFound = true;
+
+                    float r = ModSettings.customPokemonR / 255f;
+                    float g = ModSettings.customPokemonG / 255f;
+                    float b = ModSettings.customPokemonB / 255f;
+
+                    Box box = pokemonEntity.getBoundingBox().offset(-camera.x, -camera.y, -camera.z);
+
+                    WorldRenderer.drawBox(matrices, buffer, box, r, g, b, 1.0f);
+                    drawTracer(matrices, buffer, pokemonEntity, camera, r, g, b);
+                }
+            }
+        }
+
+        // =========================================================
         // BERRY DROP ESP — zobrazí se jen když je Berry Harvest aktivní
         // =========================================================
 
@@ -227,6 +264,10 @@ public class ESPRenderer {
     // TRACER
     // =============================================================
 
+    // =============================================================
+    // TRACER (S VYHLAZOVÁNÍM A PODPOROU FIRST/THIRD PERSON)
+    // =============================================================
+
     private static void drawTracer(
             MatrixStack matrices,
             VertexConsumer buffer,
@@ -236,16 +277,32 @@ public class ESPRenderer {
             float g,
             float b
     ) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        float tickDelta = client.getRenderTickCounter().getTickDelta(true);
 
-        Vec3d start = new Vec3d(0, -0.5, 0);
+        Vec3d startRaw;
 
-        Vec3d end =
-                entity.getPos()
-                        .add(0, entity.getHeight() * 0.5, 0)
-                        .subtract(camera);
+        // Zjistíme, jestli hráč kouká z první osoby (First-Person)
+        if (client.options.getPerspective().isFirstPerson()) {
+            // Z první osoby: Kreslíme čáru přímo z crosshairu (z kamery)
+            // Přidáme malinký posun (0.1) dopředu po směru tvého pohledu, aby se čára nebugovala o samotnou kameru
+            Vec3d lookVec = client.player.getRotationVec(tickDelta);
+            startRaw = camera.add(lookVec.multiply(0.1));
+        } else {
+            // Ze třetí osoby: Kreslíme čáru z poloviny těla (hrudník)
+            startRaw = client.player.getLerpedPos(tickDelta).add(0, client.player.getHeight() * 0.5, 0);
+        }
+
+        // Odečteme pozici kamery pro oba případy
+        Vec3d start = startRaw.subtract(camera);
+
+        // Konec čáry (cíl = pokémon) zůstává stejný
+        Vec3d targetPos = entity.getLerpedPos(tickDelta);
+        Vec3d end = targetPos
+                .add(0, entity.getHeight() * 0.5, 0)
+                .subtract(camera);
 
         Vec3d dir = end.subtract(start).normalize();
-
         Matrix4f matrix = matrices.peek().getPositionMatrix();
 
         buffer.vertex(matrix, (float) start.x, (float) start.y, (float) start.z)

@@ -5,6 +5,17 @@ public class ModSettings {
     public static boolean shinyLegendaryEspEnabled = false;
     public static boolean ivScannerEnabled = false;
 
+    // =========================================================
+    // CUSTOM POKEMON ESP
+    // =========================================================
+    public static boolean customPokemonEspEnabled = false;
+    public static String customPokemonName = "Pikachu";
+    public static int customPokemonRadius = 128;
+    public static int customPokemonR = 255;
+    public static int customPokemonG = 255;
+    public static int customPokemonB = 0;
+    public static boolean customPokemonFound = false;
+
     public static boolean autoJumpAssist = false;
 
     public static boolean apricornEnabled = false;
