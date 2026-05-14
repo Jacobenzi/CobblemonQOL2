@@ -1215,7 +1215,7 @@ public class ClickGuiScreen extends Screen {
         float contentHeight = 0f;
 
         if (selectedCategory == Category.ESP) {
-            contentHeight = 140f;
+            contentHeight = 360f;
         }
 
         if (selectedCategory == Category.FARMING) {

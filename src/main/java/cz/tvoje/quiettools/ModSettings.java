@@ -24,12 +24,12 @@ public class ModSettings {
     public static boolean vivichokeEnabled = false;
     public static int harvestRadius = 5;
 
-    public static boolean harvestGrepa = true;
-    public static boolean harvestPomeg = true;
-    public static boolean harvestTamato = true;
-    public static boolean harvestHondew = true;
-    public static boolean harvestQualot = true;
-    public static boolean harvestKelpsy = true;
+    public static boolean harvestGrepa = false;
+    public static boolean harvestPomeg = false;
+    public static boolean harvestTamato = false;
+    public static boolean harvestHondew = false;
+    public static boolean harvestQualot = false;
+    public static boolean harvestKelpsy = false;
 
     public static int espRadius = 128;
 
@@ -61,9 +61,9 @@ public class ModSettings {
     public static int xrayOpacity = 255;
 
     // Vanilla ores
-    public static boolean xrayShowDiamond = true;
-    public static boolean xrayShowEmerald = true;
-    public static boolean xrayShowAncientDebris = true;
+    public static boolean xrayShowDiamond = false;
+    public static boolean xrayShowEmerald = false;
+    public static boolean xrayShowAncientDebris = false;
     public static boolean xrayShowGold = false;
     public static boolean xrayShowCopper = false;
     public static boolean xrayShowIron = false;
@@ -101,17 +101,17 @@ public class ModSettings {
     public static int xrayAncientDebrisB = 0;
 
     // Mythic Metals ores (včetně Kyber)
-    public static boolean xrayShowKyber = true;
-    public static boolean xrayShowOrichalcum = true;
-    public static boolean xrayShowKalimite = true;
-    public static boolean xrayShowMalachite = true;
-    public static boolean xrayShowTitanium = true;
-    public static boolean xrayShowAdamantite = true;
-    public static boolean xrayShowMithril = true;
-    public static boolean xrayShowPlatinum = true;
+    public static boolean xrayShowKyber = false;
+    public static boolean xrayShowOrichalcum = false;
+    public static boolean xrayShowKalimite = false;
+    public static boolean xrayShowMalachite = false;
+    public static boolean xrayShowTitanium = false;
+    public static boolean xrayShowAdamantite = false;
+    public static boolean xrayShowMithril = false;
+    public static boolean xrayShowPlatinum = false;
     public static boolean xrayShowSilver = false;
-    public static boolean xrayShowBanglum = true;
-    public static boolean xrayShowRunite = true;
+    public static boolean xrayShowBanglum = false;
+    public static boolean xrayShowRunite = false;
 
     // Mythic Metals ore colors
     public static int xrayKyberR = 0;

@@ -79,7 +79,7 @@ public class XrayModule {
 
     private static void addMythicMetalsOres() {
         try {
-            if (ModSettings.xrayShowKyber) addBlockIfExists("cobblemon", "kyber_ore", "kyber");
+            if (ModSettings.xrayShowKyber) addBlockIfExists("mythicmetals", "kyber_ore", "kyber");
             if (ModSettings.xrayShowOrichalcum) addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
             if (ModSettings.xrayShowKalimite) addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
             if (ModSettings.xrayShowMalachite) addBlockIfExists("mythicmetals", "malachite_ore", "malachite");

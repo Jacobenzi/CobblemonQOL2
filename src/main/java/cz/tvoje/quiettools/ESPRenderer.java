@@ -25,7 +25,6 @@ import org.lwjgl.opengl.GL11;
 public class ESPRenderer {
 
     public static void register() {
-
         WorldRenderEvents.LAST.register(
                 ESPRenderer::render
         );
@@ -51,82 +50,73 @@ public class ESPRenderer {
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
         // =========================================================
-        // POKEMON ESP
+        // POKEMON ESP (SPOJENÁ SMYČKA S PRIORITAMI)
         // =========================================================
 
-        for (PokemonEntity pokemonEntity :
-                client.world.getEntitiesByClass(
-                        PokemonEntity.class,
-                        client.player.getBoundingBox().expand(ModSettings.espRadius),
-                        entity -> true
-                )) {
+        // Zjistíme si maximální radius, abychom pokryli jak klasické ESP, tak Custom hledání
+        int maxRadius = Math.max(ModSettings.espRadius, ModSettings.customPokemonRadius);
+        Box searchBox = client.player.getBoundingBox().expand(maxRadius);
+
+        ModSettings.customPokemonFound = false;
+
+        for (PokemonEntity pokemonEntity : client.world.getEntitiesByClass(PokemonEntity.class, searchBox, entity -> true)) {
 
             Pokemon pokemon = pokemonEntity.getPokemon();
-
             if (pokemon == null || pokemon.getSpecies() == null || pokemon.getSpecies().getName() == null) continue;
+
+            // Zkontrolujeme, jestli je pokémon v dosahu pro konkrétní skenery
+            boolean inEspRange = client.player.getBoundingBox().expand(ModSettings.espRadius).intersects(pokemonEntity.getBoundingBox());
+            boolean inCustomRange = client.player.getBoundingBox().expand(ModSettings.customPokemonRadius).intersects(pokemonEntity.getBoundingBox());
+
+            // Zjistíme, jestli se jedná o Custom Pokémona zadaného v GUI
+            String pokemonName = pokemon.getSpecies().getName().toLowerCase();
+            String searchName = ModSettings.customPokemonName.toLowerCase().trim();
+            boolean isCustomMatch = ModSettings.customPokemonEspEnabled && !searchName.isEmpty() && pokemonName.contains(searchName);
+
+            // Pokud jsme ho našli v dosahu Custom Radiusu, aktualizujeme GUI status
+            if (isCustomMatch && inCustomRange) {
+                ModSettings.customPokemonFound = true;
+            }
 
             float r = 1f, g = 1f, b = 1f;
             boolean shouldRender = false;
             boolean shouldGlow = false;
 
-            if (ModSettings.shinyLegendaryEspEnabled && (pokemon.getShiny() || isLegendary(pokemon))) {
+            // --- HIERARCHIE BAREV (Kdo dřív přijde, ten přebíjí) ---
+
+            // 1. NEJVYŠŠÍ PRIORITA: Shiny / Legendary
+            if (inEspRange && ModSettings.shinyLegendaryEspEnabled && (pokemon.getShiny() || isLegendary(pokemon))) {
                 r = ModSettings.shinyR / 255f; g = ModSettings.shinyG / 255f; b = ModSettings.shinyB / 255f;
                 shouldRender = true; shouldGlow = true;
-            } else if (ModSettings.blisseyEspEnabled && isTargetBlissey(pokemon)) {
-                r = ModSettings.blisseyR / 255f; g = ModSettings.blisseyG / 255f; b = ModSettings.blisseyB / 255f;
-                shouldRender = true;
-            } else if (ModSettings.ivScannerEnabled && countPerfectIVs(pokemon) >= 3) {
+            }
+            // 2. DRUHÁ PRIORITA: Perfektní IVs (3x 31 a víc)
+            else if (inEspRange && ModSettings.ivScannerEnabled && countPerfectIVs(pokemon) >= 3) {
                 r = ModSettings.ivR / 255f; g = ModSettings.ivG / 255f; b = ModSettings.ivB / 255f;
                 shouldRender = true;
             }
+            // 3. TŘETÍ PRIORITA: Cílený Custom Pokémon (Např. tvůj Magikarp z GUI)
+            else if (inCustomRange && isCustomMatch) {
+                r = ModSettings.customPokemonR / 255f; g = ModSettings.customPokemonG / 255f; b = ModSettings.customPokemonB / 255f;
+                shouldRender = true;
+            }
+            // 4. NEJNIŽŠÍ PRIORITA: Blissey farma
+            else if (inEspRange && ModSettings.blisseyEspEnabled && isTargetBlissey(pokemon)) {
+                r = ModSettings.blisseyR / 255f; g = ModSettings.blisseyG / 255f; b = ModSettings.blisseyB / 255f;
+                shouldRender = true;
+            }
 
+            // Zapnutí/vypnutí vanilla glow efektu (pro shiny/legendary za zdí)
             if (pokemonEntity.isGlowing() != shouldGlow) {
                 pokemonEntity.setGlowing(shouldGlow);
             }
 
+            // Pokud nesplnil ani jednu podmínku výše, vůbec ho nekreslíme
             if (!shouldRender) continue;
 
             Box box = pokemonEntity.getBoundingBox().offset(-camera.x, -camera.y, -camera.z);
 
             WorldRenderer.drawBox(matrices, buffer, box, r, g, b, 1.0f);
             drawTracer(matrices, buffer, pokemonEntity, camera, r, g, b);
-        }
-
-        // =========================================================
-        // CUSTOM POKEMON ESP
-        // =========================================================
-
-        if (ModSettings.customPokemonEspEnabled && !ModSettings.customPokemonName.isEmpty()) {
-
-            ModSettings.customPokemonFound = false;
-
-            for (PokemonEntity pokemonEntity :
-                    client.world.getEntitiesByClass(
-                            PokemonEntity.class,
-                            client.player.getBoundingBox().expand(ModSettings.customPokemonRadius),
-                            entity -> true
-                    )) {
-
-                Pokemon pokemon = pokemonEntity.getPokemon();
-
-                if (pokemon == null || pokemon.getSpecies() == null || pokemon.getSpecies().getName() == null) continue;
-
-                String pokemonName = pokemon.getSpecies().getName().toLowerCase();
-                String searchName = ModSettings.customPokemonName.toLowerCase().trim();
-
-                if (pokemonName.contains(searchName)) {
-                    ModSettings.customPokemonFound = true;
-
-                    float r = ModSettings.customPokemonR / 255f;
-                    float g = ModSettings.customPokemonG / 255f;
-                    float b = ModSettings.customPokemonB / 255f;
-
-                    Box box = pokemonEntity.getBoundingBox().offset(-camera.x, -camera.y, -camera.z);
-
-                    WorldRenderer.drawBox(matrices, buffer, box, r, g, b, 1.0f);
-                    drawTracer(matrices, buffer, pokemonEntity, camera, r, g, b);
-                }
-            }
         }
 
         // =========================================================
@@ -179,11 +169,9 @@ public class ESPRenderer {
     // =============================================================
 
     private static boolean isTargetBlissey(Pokemon pokemon) {
-
         return pokemon.getSpecies()
                 .getName()
                 .equalsIgnoreCase("blissey")
-
                 && pokemon.getLevel() >= 80;
     }
 
@@ -196,31 +184,13 @@ public class ESPRenderer {
         boolean hasTag = false;
 
         try {
-
-            hasTag =
-                    pokemon.getSpecies()
-                            .getLabels()
-                            .contains("legendary")
-
-                            ||
-
-                            pokemon.getSpecies()
-                                    .getLabels()
-                                    .contains("mythical")
-
-                            ||
-
-                            pokemon.getSpecies()
-                                    .getLabels()
-                                    .contains("ultra_beast");
-
+            hasTag = pokemon.getSpecies().getLabels().contains("legendary")
+                    || pokemon.getSpecies().getLabels().contains("mythical")
+                    || pokemon.getSpecies().getLabels().contains("ultra_beast");
         } catch (Exception ignored) {
         }
 
-        String name =
-                pokemon.getSpecies()
-                        .getName()
-                        .toLowerCase();
+        String name = pokemon.getSpecies().getName().toLowerCase();
 
         boolean hardcoded =
                 name.equals("mewtwo")
@@ -261,10 +231,6 @@ public class ESPRenderer {
     }
 
     // =============================================================
-    // TRACER
-    // =============================================================
-
-    // =============================================================
     // TRACER (S VYHLAZOVÁNÍM A PODPOROU FIRST/THIRD PERSON)
     // =============================================================
 
@@ -282,21 +248,14 @@ public class ESPRenderer {
 
         Vec3d startRaw;
 
-        // Zjistíme, jestli hráč kouká z první osoby (First-Person)
         if (client.options.getPerspective().isFirstPerson()) {
-            // Z první osoby: Kreslíme čáru přímo z crosshairu (z kamery)
-            // Přidáme malinký posun (0.1) dopředu po směru tvého pohledu, aby se čára nebugovala o samotnou kameru
             Vec3d lookVec = client.player.getRotationVec(tickDelta);
             startRaw = camera.add(lookVec.multiply(0.1));
         } else {
-            // Ze třetí osoby: Kreslíme čáru z poloviny těla (hrudník)
             startRaw = client.player.getLerpedPos(tickDelta).add(0, client.player.getHeight() * 0.5, 0);
         }
 
-        // Odečteme pozici kamery pro oba případy
         Vec3d start = startRaw.subtract(camera);
-
-        // Konec čáry (cíl = pokémon) zůstává stejný
         Vec3d targetPos = entity.getLerpedPos(tickDelta);
         Vec3d end = targetPos
                 .add(0, entity.getHeight() * 0.5, 0)
