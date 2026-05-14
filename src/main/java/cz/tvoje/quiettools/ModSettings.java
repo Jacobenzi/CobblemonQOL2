@@ -59,9 +59,8 @@ public class ModSettings {
     public static boolean xrayShowLapis = false;
     public static boolean xrayShowRedstone = false;
     public static boolean xrayShowCoal = false;
-    public static boolean xrayShowKyber = true;
 
-    // Vanilla + Cobblemon ore colors
+    // Vanilla ore colors
     public static int xrayDiamondR = 0;
     public static int xrayDiamondG = 255;
     public static int xrayDiamondB = 255;
@@ -89,11 +88,9 @@ public class ModSettings {
     public static int xrayAncientDebrisR = 255;
     public static int xrayAncientDebrisG = 107;
     public static int xrayAncientDebrisB = 0;
-    public static int xrayKyberR = 0;
-    public static int xrayKyberG = 153;
-    public static int xrayKyberB = 255;
 
-    // Mythic Metals ores
+    // Mythic Metals ores (včetně Kyber)
+    public static boolean xrayShowKyber = true;
     public static boolean xrayShowOrichalcum = true;
     public static boolean xrayShowKalimite = true;
     public static boolean xrayShowMalachite = true;
@@ -104,6 +101,51 @@ public class ModSettings {
     public static boolean xrayShowSilver = false;
     public static boolean xrayShowBanglum = true;
     public static boolean xrayShowRunite = true;
+
+    // Mythic Metals ore colors
+    public static int xrayKyberR = 0;
+    public static int xrayKyberG = 153;
+    public static int xrayKyberB = 255;
+
+    public static int xrayOrichalcumR = 255;
+    public static int xrayOrichalcumG = 0;
+    public static int xrayOrichalcumB = 255;
+
+    public static int xrayKalimiteR = 0;
+    public static int xrayKalimiteG = 255;
+    public static int xrayKalimiteB = 255;
+
+    public static int xrayMalachiteR = 0;
+    public static int xrayMalachiteG = 170;
+    public static int xrayMalachiteB = 0;
+
+    public static int xrayTitaniumR = 221;
+    public static int xrayTitaniumG = 221;
+    public static int xrayTitaniumB = 221;
+
+    public static int xrayAdamantiteR = 139;
+    public static int xrayAdamantiteG = 0;
+    public static int xrayAdamantiteB = 0;
+
+    public static int xrayMithrilR = 135;
+    public static int xrayMithrilG = 206;
+    public static int xrayMithrilB = 235;
+
+    public static int xrayPlatinumR = 229;
+    public static int xrayPlatinumG = 228;
+    public static int xrayPlatinumB = 226;
+
+    public static int xraySilverR = 192;
+    public static int xraySilverG = 192;
+    public static int xraySilverB = 192;
+
+    public static int xrayBanglumR = 255;
+    public static int xrayBanglumG = 179;
+    public static int xrayBanglumB = 71;
+
+    public static int xrayRuniteR = 128;
+    public static int xrayRuniteG = 0;
+    public static int xrayRuniteB = 128;
 
     // =========================================================
     // FULLBRIGHT SETTINGS

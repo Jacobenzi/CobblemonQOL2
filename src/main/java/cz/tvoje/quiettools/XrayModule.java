@@ -22,7 +22,6 @@ import java.util.Set;
 public class XrayModule {
 
     private static final Set<Block> targetBlocks = new HashSet<>();
-    // Mapování bloků na jejich ID pro barvu
     private static final Map<Block, String> blockOreIds = new HashMap<>();
 
     static {
@@ -69,9 +68,6 @@ public class XrayModule {
             addOre(Blocks.COAL_ORE, "coal");
             addOre(Blocks.DEEPSLATE_COAL_ORE, "coal");
         }
-        if (ModSettings.xrayShowKyber) {
-            addBlockIfExists("cobblemon", "kyber_ore", "kyber");
-        }
 
         addMythicMetalsOres();
     }
@@ -83,6 +79,7 @@ public class XrayModule {
 
     private static void addMythicMetalsOres() {
         try {
+            if (ModSettings.xrayShowKyber) addBlockIfExists("cobblemon", "kyber_ore", "kyber");
             if (ModSettings.xrayShowOrichalcum) addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
             if (ModSettings.xrayShowKalimite) addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
             if (ModSettings.xrayShowMalachite) addBlockIfExists("mythicmetals", "malachite_ore", "malachite");
@@ -118,9 +115,8 @@ public class XrayModule {
 
         World world = client.world;
         BlockPos playerPos = client.player.getBlockPos();
-        int radius = Math.min(ModSettings.xrayRadius, 64); // Max 64 bloků aby nebyla lag
+        int radius = Math.min(ModSettings.xrayRadius, 64);
 
-        // Scanuj VŠECHNY blíž k hráči (opraveno: += 1 místo += 2)
         for (int x = playerPos.getX() - radius; x <= playerPos.getX() + radius; x++) {
             for (int y = playerPos.getY() - radius; y <= playerPos.getY() + radius; y++) {
                 for (int z = playerPos.getZ() - radius; z <= playerPos.getZ() + radius; z++) {
@@ -173,19 +169,19 @@ public class XrayModule {
         if (oreId.equals("lapis")) return rgb(ModSettings.xrayLapisR, ModSettings.xrayLapisG, ModSettings.xrayLapisB);
         if (oreId.equals("redstone")) return rgb(ModSettings.xrayRedstoneR, ModSettings.xrayRedstoneG, ModSettings.xrayRedstoneB);
         if (oreId.equals("coal")) return rgb(ModSettings.xrayCoalR, ModSettings.xrayCoalG, ModSettings.xrayCoalB);
-        if (oreId.equals("kyber")) return rgb(ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
 
-        // Mythic Metals
-        if (oreId.equals("orichalcum")) return 0xFF00FF;
-        if (oreId.equals("kalimite")) return 0x00FFFF;
-        if (oreId.equals("malachite")) return 0x00AA00;
-        if (oreId.equals("titanium")) return 0xDDDDDD;
-        if (oreId.equals("adamantite")) return 0x8B0000;
-        if (oreId.equals("mithril")) return 0x87CEEB;
-        if (oreId.equals("platinum")) return 0xE5E4E2;
-        if (oreId.equals("silver")) return 0xC0C0C0;
-        if (oreId.equals("banglum")) return 0xFFB347;
-        if (oreId.equals("runite")) return 0x800080;
+        // Mythic Metals ores
+        if (oreId.equals("kyber")) return rgb(ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
+        if (oreId.equals("orichalcum")) return rgb(ModSettings.xrayOrichalcumR, ModSettings.xrayOrichalcumG, ModSettings.xrayOrichalcumB);
+        if (oreId.equals("kalimite")) return rgb(ModSettings.xrayKalimiteR, ModSettings.xrayKalimiteG, ModSettings.xrayKalimiteB);
+        if (oreId.equals("malachite")) return rgb(ModSettings.xrayMalachiteR, ModSettings.xrayMalachiteG, ModSettings.xrayMalachiteB);
+        if (oreId.equals("titanium")) return rgb(ModSettings.xrayTitaniumR, ModSettings.xrayTitaniumG, ModSettings.xrayTitaniumB);
+        if (oreId.equals("adamantite")) return rgb(ModSettings.xrayAdamantiteR, ModSettings.xrayAdamantiteG, ModSettings.xrayAdamantiteB);
+        if (oreId.equals("mithril")) return rgb(ModSettings.xrayMithrilR, ModSettings.xrayMithrilG, ModSettings.xrayMithrilB);
+        if (oreId.equals("platinum")) return rgb(ModSettings.xrayPlatinumR, ModSettings.xrayPlatinumG, ModSettings.xrayPlatinumB);
+        if (oreId.equals("silver")) return rgb(ModSettings.xraySilverR, ModSettings.xraySilverG, ModSettings.xraySilverB);
+        if (oreId.equals("banglum")) return rgb(ModSettings.xrayBanglumR, ModSettings.xrayBanglumG, ModSettings.xrayBanglumB);
+        if (oreId.equals("runite")) return rgb(ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
 
         return 0xFFFFFF;
     }

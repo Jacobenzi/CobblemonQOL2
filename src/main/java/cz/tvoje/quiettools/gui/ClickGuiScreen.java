@@ -121,7 +121,6 @@ public class ClickGuiScreen extends Screen {
     private SliderComponent ivGSlider;
     private SliderComponent ivBSlider;
 
-    // NOVÉ: Berry color sliders
     private SliderComponent berryRSlider;
     private SliderComponent berryGSlider;
     private SliderComponent berryBSlider;
@@ -148,9 +147,9 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayLapisButton;
     private ModuleButton xrayRedstoneButton;
     private ModuleButton xrayCopperButton;
-    private ModuleButton xrayKyberButton;
 
-    // Mythic Metals ores
+    // Mythic Metals ores (včetně Kyber)
+    private ModuleButton xrayKyberButton;
     private ModuleButton xrayOrichalcumButton;
     private ModuleButton xrayKalimiteButton;
     private ModuleButton xrayMalachiteButton;
@@ -611,6 +610,7 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayCopperB = value
                 ));
 
+        // Mythic Metals ores (včetně Kyber)
         xrayKyberButton = new ModuleButton(0, 0, componentWidth, 22, "Kyber",
                 () -> ModSettings.xrayShowKyber,
                 v -> {
@@ -625,76 +625,145 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayKyberB = value
                 ));
 
-        // Mythic Metals ores
         xrayOrichalcumButton = new ModuleButton(0, 0, componentWidth, 22, "Orichalcum",
                 () -> ModSettings.xrayShowOrichalcum,
                 v -> {
                     ModSettings.xrayShowOrichalcum = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Orichalcum",
+                        () -> ModSettings.xrayOrichalcumR, () -> ModSettings.xrayOrichalcumG, () -> ModSettings.xrayOrichalcumB,
+                        value -> ModSettings.xrayOrichalcumR = value,
+                        value -> ModSettings.xrayOrichalcumG = value,
+                        value -> ModSettings.xrayOrichalcumB = value
+                ));
 
         xrayKalimiteButton = new ModuleButton(0, 0, componentWidth, 22, "Kalimite",
                 () -> ModSettings.xrayShowKalimite,
                 v -> {
                     ModSettings.xrayShowKalimite = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Kalimite",
+                        () -> ModSettings.xrayKalimiteR, () -> ModSettings.xrayKalimiteG, () -> ModSettings.xrayKalimiteB,
+                        value -> ModSettings.xrayKalimiteR = value,
+                        value -> ModSettings.xrayKalimiteG = value,
+                        value -> ModSettings.xrayKalimiteB = value
+                ));
 
         xrayMalachiteButton = new ModuleButton(0, 0, componentWidth, 22, "Malachite",
                 () -> ModSettings.xrayShowMalachite,
                 v -> {
                     ModSettings.xrayShowMalachite = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Malachite",
+                        () -> ModSettings.xrayMalachiteR, () -> ModSettings.xrayMalachiteG, () -> ModSettings.xrayMalachiteB,
+                        value -> ModSettings.xrayMalachiteR = value,
+                        value -> ModSettings.xrayMalachiteG = value,
+                        value -> ModSettings.xrayMalachiteB = value
+                ));
 
         xrayTitaniumButton = new ModuleButton(0, 0, componentWidth, 22, "Titanium",
                 () -> ModSettings.xrayShowTitanium,
                 v -> {
                     ModSettings.xrayShowTitanium = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Titanium",
+                        () -> ModSettings.xrayTitaniumR, () -> ModSettings.xrayTitaniumG, () -> ModSettings.xrayTitaniumB,
+                        value -> ModSettings.xrayTitaniumR = value,
+                        value -> ModSettings.xrayTitaniumG = value,
+                        value -> ModSettings.xrayTitaniumB = value
+                ));
 
         xrayAdamantiteButton = new ModuleButton(0, 0, componentWidth, 22, "Adamantite",
                 () -> ModSettings.xrayShowAdamantite,
                 v -> {
                     ModSettings.xrayShowAdamantite = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Adamantite",
+                        () -> ModSettings.xrayAdamantiteR, () -> ModSettings.xrayAdamantiteG, () -> ModSettings.xrayAdamantiteB,
+                        value -> ModSettings.xrayAdamantiteR = value,
+                        value -> ModSettings.xrayAdamantiteG = value,
+                        value -> ModSettings.xrayAdamantiteB = value
+                ));
 
         xrayMithrilButton = new ModuleButton(0, 0, componentWidth, 22, "Mithril",
                 () -> ModSettings.xrayShowMithril,
                 v -> {
                     ModSettings.xrayShowMithril = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Mithril",
+                        () -> ModSettings.xrayMithrilR, () -> ModSettings.xrayMithrilG, () -> ModSettings.xrayMithrilB,
+                        value -> ModSettings.xrayMithrilR = value,
+                        value -> ModSettings.xrayMithrilG = value,
+                        value -> ModSettings.xrayMithrilB = value
+                ));
 
         xrayPlatinumButton = new ModuleButton(0, 0, componentWidth, 22, "Platinum",
                 () -> ModSettings.xrayShowPlatinum,
                 v -> {
                     ModSettings.xrayShowPlatinum = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Platinum",
+                        () -> ModSettings.xrayPlatinumR, () -> ModSettings.xrayPlatinumG, () -> ModSettings.xrayPlatinumB,
+                        value -> ModSettings.xrayPlatinumR = value,
+                        value -> ModSettings.xrayPlatinumG = value,
+                        value -> ModSettings.xrayPlatinumB = value
+                ));
 
         xraySilverButton = new ModuleButton(0, 0, componentWidth, 22, "Silver",
                 () -> ModSettings.xrayShowSilver,
                 v -> {
                     ModSettings.xrayShowSilver = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Silver",
+                        () -> ModSettings.xraySilverR, () -> ModSettings.xraySilverG, () -> ModSettings.xraySilverB,
+                        value -> ModSettings.xraySilverR = value,
+                        value -> ModSettings.xraySilverG = value,
+                        value -> ModSettings.xraySilverB = value
+                ));
 
         xrayBanglumButton = new ModuleButton(0, 0, componentWidth, 22, "Banglum",
                 () -> ModSettings.xrayShowBanglum,
                 v -> {
                     ModSettings.xrayShowBanglum = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Banglum",
+                        () -> ModSettings.xrayBanglumR, () -> ModSettings.xrayBanglumG, () -> ModSettings.xrayBanglumB,
+                        value -> ModSettings.xrayBanglumR = value,
+                        value -> ModSettings.xrayBanglumG = value,
+                        value -> ModSettings.xrayBanglumB = value
+                ));
 
         xrayRuniteButton = new ModuleButton(0, 0, componentWidth, 22, "Runite",
                 () -> ModSettings.xrayShowRunite,
                 v -> {
                     ModSettings.xrayShowRunite = v;
                     XrayModule.updateTargetBlocks();
-                });
+                },
+                () -> openXrayColorPicker(
+                        "Runite",
+                        () -> ModSettings.xrayRuniteR, () -> ModSettings.xrayRuniteG, () -> ModSettings.xrayRuniteB,
+                        value -> ModSettings.xrayRuniteR = value,
+                        value -> ModSettings.xrayRuniteG = value,
+                        value -> ModSettings.xrayRuniteB = value
+                ));
     }
 
     @Override
@@ -986,55 +1055,66 @@ public class ClickGuiScreen extends Screen {
             xrayCopperButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayCopperButton.render(context, mouseX, mouseY);
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayCopperR, ModSettings.xrayCopperG, ModSettings.xrayCopperB);
-            xrayY += 24;
-
-            xrayKyberButton.setPosition(panelX + sidebarWidth + 15, xrayY);
-            xrayKyberButton.render(context, mouseX, mouseY);
-            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
             xrayY += 40;
 
             // MYTHIC METALS HEADER
             drawSectionHeader(context, "Mythic Metals", panelX + sidebarWidth + 15, xrayY);
             xrayY += 16;
 
+            xrayKyberButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayKyberButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
+            xrayY += 24;
+
             xrayOrichalcumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayOrichalcumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayOrichalcumR, ModSettings.xrayOrichalcumG, ModSettings.xrayOrichalcumB);
             xrayY += 24;
 
             xrayKalimiteButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayKalimiteButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayKalimiteR, ModSettings.xrayKalimiteG, ModSettings.xrayKalimiteB);
             xrayY += 24;
 
             xrayMalachiteButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayMalachiteButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayMalachiteR, ModSettings.xrayMalachiteG, ModSettings.xrayMalachiteB);
             xrayY += 24;
 
             xrayTitaniumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayTitaniumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayTitaniumR, ModSettings.xrayTitaniumG, ModSettings.xrayTitaniumB);
             xrayY += 24;
 
             xrayAdamantiteButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayAdamantiteButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayAdamantiteR, ModSettings.xrayAdamantiteG, ModSettings.xrayAdamantiteB);
             xrayY += 24;
 
             xrayMithrilButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayMithrilButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayMithrilR, ModSettings.xrayMithrilG, ModSettings.xrayMithrilB);
             xrayY += 24;
 
             xrayPlatinumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayPlatinumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayPlatinumR, ModSettings.xrayPlatinumG, ModSettings.xrayPlatinumB);
             xrayY += 24;
 
             xraySilverButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xraySilverButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xraySilverR, ModSettings.xraySilverG, ModSettings.xraySilverB);
             xrayY += 24;
 
             xrayBanglumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayBanglumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayBanglumR, ModSettings.xrayBanglumG, ModSettings.xrayBanglumB);
             xrayY += 24;
 
             xrayRuniteButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayRuniteButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
+            xrayY += 24;
 
             if (currentColorPicker != null) {
                 currentColorPicker.setPosition(panelX + panelWidth - 185, panelY + 36);
@@ -1067,7 +1147,7 @@ public class ClickGuiScreen extends Screen {
         }
 
         if (selectedCategory == Category.XRAY) {
-            contentHeight = 780f;
+            contentHeight = 1040f;
         }
 
         maxScroll = Math.max(0, contentHeight - (panelHeight - 40));
@@ -1274,9 +1354,9 @@ public class ClickGuiScreen extends Screen {
             xrayLapisButton.mouseClicked(mouseX, mouseY, button);
             xrayRedstoneButton.mouseClicked(mouseX, mouseY, button);
             xrayCopperButton.mouseClicked(mouseX, mouseY, button);
-            xrayKyberButton.mouseClicked(mouseX, mouseY, button);
 
             // Mythic Metals
+            xrayKyberButton.mouseClicked(mouseX, mouseY, button);
             xrayOrichalcumButton.mouseClicked(mouseX, mouseY, button);
             xrayKalimiteButton.mouseClicked(mouseX, mouseY, button);
             xrayMalachiteButton.mouseClicked(mouseX, mouseY, button);
