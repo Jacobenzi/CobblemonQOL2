@@ -21,8 +21,6 @@ import java.util.Set;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalBlock;
 
-
-
 public class XrayModule {
 
     private static final Set<Block> targetBlocks = new HashSet<>();
@@ -80,6 +78,7 @@ public class XrayModule {
         }
 
         addMythicMetalsOres();
+        addMegaShowdownOres(); // ZDE JE PŘIDANÉ VOLÁNÍ PRO NOVÝ MÓD
     }
 
     private static void addOre(Block block, String oreId) {
@@ -87,63 +86,66 @@ public class XrayModule {
         blockOreIds.put(block, oreId);
     }
 
+    // --- NOVÁ METODA PRO MEGA SHOWDOWN ---
+    private static void addMegaShowdownOres() {
+        try {
+            // Přidaná podmínka!
+            if (ModSettings.xrayShowKeystone) {
+                addBlockIfExists("mega_showdown", "keystone_ore", "keystone");
+                addBlockIfExists("mega_showdown", "deepslate_keystone_ore", "keystone");
+            }
+        } catch (Exception e) {
+            // Mód není nainstalovaný
+        }
+    }
+    // -------------------------------------
+
     private static void addMythicMetalsOres() {
         try {
             if (ModSettings.xrayShowKyber) {
                 addBlockIfExists("mythicmetals", "kyber_ore", "kyber");
                 addBlockIfExists("mythicmetals", "deepslate_kyber_ore", "kyber");
             }
-
             if (ModSettings.xrayShowOrichalcum) {
                 addBlockIfExists("mythicmetals", "orichalcum_ore", "orichalcum");
                 addBlockIfExists("mythicmetals", "deepslate_orichalcum_ore", "orichalcum");
             }
-
             if (ModSettings.xrayShowKalimite) {
                 addBlockIfExists("mythicmetals", "kalimite_ore", "kalimite");
                 addBlockIfExists("mythicmetals", "deepslate_kalimite_ore", "kalimite");
             }
-
             if (ModSettings.xrayShowMalachite) {
                 addBlockIfExists("mythicmetals", "malachite_ore", "malachite");
                 addBlockIfExists("mythicmetals", "deepslate_malachite_ore", "malachite");
             }
-
             if (ModSettings.xrayShowTitanium) {
                 addBlockIfExists("mythicmetals", "titanium_ore", "titanium");
                 addBlockIfExists("mythicmetals", "deepslate_titanium_ore", "titanium");
             }
-
             if (ModSettings.xrayShowAdamantite) {
                 addBlockIfExists("mythicmetals", "adamantite_ore", "adamantite");
                 addBlockIfExists("mythicmetals", "deepslate_adamantite_ore", "adamantite");
             }
-
             if (ModSettings.xrayShowMithril) {
                 addBlockIfExists("mythicmetals", "mithril_ore", "mithril");
                 addBlockIfExists("mythicmetals", "deepslate_mithril_ore", "mithril");
             }
-
             if (ModSettings.xrayShowPlatinum) {
                 addBlockIfExists("mythicmetals", "platinum_ore", "platinum");
                 addBlockIfExists("mythicmetals", "deepslate_platinum_ore", "platinum");
             }
-
             if (ModSettings.xrayShowSilver) {
                 addBlockIfExists("mythicmetals", "silver_ore", "silver");
                 addBlockIfExists("mythicmetals", "deepslate_silver_ore", "silver");
             }
-
             if (ModSettings.xrayShowBanglum) {
                 addBlockIfExists("mythicmetals", "banglum_ore", "banglum");
                 addBlockIfExists("mythicmetals", "deepslate_banglum_ore", "banglum");
             }
-
             if (ModSettings.xrayShowRunite) {
                 addBlockIfExists("mythicmetals", "runite_ore", "runite");
                 addBlockIfExists("mythicmetals", "deepslate_runite_ore", "runite");
             }
-
             if (ModSettings.xrayShowCarmot) {
                 addBlockIfExists("mythicmetals", "carmot_ore", "carmot");
                 addBlockIfExists("mythicmetals", "deepslate_carmot_ore", "carmot");
@@ -224,9 +226,6 @@ public class XrayModule {
         // 2. BARITONE AUTOPILOT LOGIKA
         // =========================================================
         if (cz.tvoje.quiettools.ModSettings.autoMineBot) {
-
-            // TADY JSME SMAZALI TO SPAMOVÁNÍ NASTAVENÍ!
-
             var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
 
             if (closestPos != null) {
@@ -249,7 +248,6 @@ public class XrayModule {
             }
         }
     }
-
 
     private static void renderOreBox(WorldRenderContext context, BlockPos pos, Block block) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -278,6 +276,9 @@ public class XrayModule {
 
     private static int getOreColor(Block block) {
         String oreId = blockOreIds.getOrDefault(block, "");
+
+        // --- ZDE JE PŘIDANÁ BARVA PRO KEYSTONE ORE ---
+        if (oreId.equals("keystone")) return 0x9933FF; // Zářivá fialová barva (Hex: #9933FF)
 
         // Vanilla ores
         if (oreId.equals("diamond")) return rgb(ModSettings.xrayDiamondR, ModSettings.xrayDiamondG, ModSettings.xrayDiamondB);

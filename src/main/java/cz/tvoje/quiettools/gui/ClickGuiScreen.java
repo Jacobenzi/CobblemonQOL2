@@ -176,6 +176,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayBanglumButton;
     private ModuleButton xrayRuniteButton;
     private ModuleButton xrayCarmotButton;
+    private ModuleButton keystoneOreButton;
 
     private ColorPickerComponent currentColorPicker;
 
@@ -691,6 +692,23 @@ public class ClickGuiScreen extends Screen {
                 ));
 
         // Mythic Metals ores (včetně Kyber)
+
+        // Mythic Metals ores (včetně Kyber)
+
+        keystoneOreButton = new ModuleButton(0, 0, componentWidth, 22, "Keystone Ore",
+                () -> ModSettings.xrayShowKeystone,
+                value -> {
+                    ModSettings.xrayShowKeystone = value;
+                    cz.tvoje.quiettools.XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Keystone ore",
+                        () -> ModSettings.xrayKeystoneR, () -> ModSettings.xrayKeystoneG, () -> ModSettings.xrayKeystoneB,
+                        value -> ModSettings.xrayKeystoneR = value,
+                        value -> ModSettings.xrayKeystoneG = value,
+                        value -> ModSettings.xrayKeystoneB = value
+                ));
+
         xrayKyberButton = new ModuleButton(0, 0, componentWidth, 22, "Kyber",
                 () -> ModSettings.xrayShowKyber,
                 v -> {
@@ -858,6 +876,8 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayCarmotG = value,
                         value -> ModSettings.xrayCarmotB = value
                 ));
+
+
 
         // =========================================================
         // CUSTOM POKEMON ESP COMPONENTS
@@ -1245,6 +1265,11 @@ public class ClickGuiScreen extends Screen {
             drawSectionHeader(context, "Mythic Metals", panelX + sidebarWidth + 15, xrayY);
             xrayY += 16;
 
+            keystoneOreButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            keystoneOreButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayKeystoneR, ModSettings.xrayKeystoneG, ModSettings.xrayKeystoneB);
+            xrayY += 24;
+
             xrayKyberButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayKyberButton.render(context, mouseX, mouseY);
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayKyberR, ModSettings.xrayKyberG, ModSettings.xrayKyberB);
@@ -1557,6 +1582,7 @@ public class ClickGuiScreen extends Screen {
             xrayQuartzButton.mouseClicked(mouseX, mouseY, button);
 
             // Mythic Metals
+            keystoneOreButton.mouseClicked(mouseX, mouseY, button);
             xrayKyberButton.mouseClicked(mouseX, mouseY, button);
             xrayOrichalcumButton.mouseClicked(mouseX, mouseY, button);
             xrayKalimiteButton.mouseClicked(mouseX, mouseY, button);
