@@ -158,6 +158,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayLapisButton;
     private ModuleButton xrayRedstoneButton;
     private ModuleButton xrayCopperButton;
+    private ModuleButton xrayQuartzButton;
 
     // Mythic Metals ores (včetně Kyber)
     private ModuleButton xrayKyberButton;
@@ -620,6 +621,20 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayCopperR = value,
                         value -> ModSettings.xrayCopperG = value,
                         value -> ModSettings.xrayCopperB = value
+                ));
+
+        xrayQuartzButton = new ModuleButton(0, 0, componentWidth, 22, "Quartz",
+                () -> ModSettings.xrayShowQuartz,
+                v -> {
+                    ModSettings.xrayShowQuartz = v;
+                    XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Quartz",
+                        () -> ModSettings.xrayQuartzR, () -> ModSettings.xrayQuartzG, () -> ModSettings.xrayQuartzB,
+                        value -> ModSettings.xrayQuartzR = value,
+                        value -> ModSettings.xrayQuartzG = value,
+                        value -> ModSettings.xrayQuartzB = value
                 ));
 
         // Mythic Metals ores (včetně Kyber)
@@ -1154,6 +1169,11 @@ public class ClickGuiScreen extends Screen {
             xrayCopperButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayCopperButton.render(context, mouseX, mouseY);
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayCopperR, ModSettings.xrayCopperG, ModSettings.xrayCopperB);
+            xrayY += 24;
+
+            xrayQuartzButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayQuartzButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayQuartzR, ModSettings.xrayQuartzG, ModSettings.xrayQuartzB);
             xrayY += 40;
 
             // MYTHIC METALS HEADER
@@ -1466,6 +1486,7 @@ public class ClickGuiScreen extends Screen {
             xrayLapisButton.mouseClicked(mouseX, mouseY, button);
             xrayRedstoneButton.mouseClicked(mouseX, mouseY, button);
             xrayCopperButton.mouseClicked(mouseX, mouseY, button);
+            xrayQuartzButton.mouseClicked(mouseX, mouseY, button);
 
             // Mythic Metals
             xrayKyberButton.mouseClicked(mouseX, mouseY, button);

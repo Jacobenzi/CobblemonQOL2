@@ -3,6 +3,7 @@ package cz.tvoje.quiettools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.registry.Registries;
@@ -22,7 +23,6 @@ public class Harvester {
 
     public static int radius = 5;
 
-    // Paměť pro záhonky, kterým chyběla semínka
     private static final List<BlockPos> pendingReplants = new ArrayList<>();
 
     public static void harvest(ClientPlayerEntity player, World world) {
@@ -44,14 +44,10 @@ public class Harvester {
                         String namespace = id.getNamespace();
                         String path = id.getPath();
 
-                        // =========================================================
-                        // 1. SKLÍZENÍ (Cobblemon rostliny)
-                        // =========================================================
                         if (namespace.equals("cobblemon")) {
                             boolean isApricorn = path.contains("apricorn");
                             boolean isVivichoke = path.contains("vivichoke");
 
-                            // DYNAMICKÁ KONTROLA BOBULÍ PODLE NASTAVENÍ V MENU
                             boolean isVipBerry = false;
                             if (path.contains("grepa") && ModSettings.harvestGrepa) isVipBerry = true;
                             else if (path.contains("pomeg") && ModSettings.harvestPomeg) isVipBerry = true;
@@ -69,12 +65,8 @@ public class Harvester {
                             }
                         }
 
-                        // =========================================================
-                        // 2. AUTO-PLANT (Prázdná hlína v Minecraftu)
-                        // =========================================================
                         else if (namespace.equals("minecraft") && path.equals("farmland")) {
                             if (ModSettings.vivichokeEnabled) {
-                                // Zkontrolujeme, jestli je blok nad hlínou volný (vzduch)
                                 BlockPos upPos = pos.up();
                                 if (world.getBlockState(upPos).isAir()) {
                                     plantSeedOnFarmland(player, pos);
@@ -105,6 +97,10 @@ public class Harvester {
         );
     }
 
+    // =========================================================
+    // OPRAVENO: přidán UpdateSelectedSlotC2SPacket aby server věděl o změně slotu
+    // =========================================================
+
     private static void destroyAndReplant(ClientPlayerEntity player, BlockPos pos) {
         player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
         player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.UP));
@@ -114,13 +110,16 @@ public class Harvester {
 
         if (seedSlot != -1) {
             int previousSlot = player.getInventory().selectedSlot;
+
             player.getInventory().selectedSlot = seedSlot;
+            player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(seedSlot));
 
             player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(
                     Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(dirtPos), Direction.UP, dirtPos, false), 0
             ));
 
             player.getInventory().selectedSlot = previousSlot;
+            player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(previousSlot));
         } else {
             if (!pendingReplants.contains(dirtPos)) {
                 pendingReplants.add(dirtPos);
@@ -133,13 +132,16 @@ public class Harvester {
 
         if (seedSlot != -1) {
             int previousSlot = player.getInventory().selectedSlot;
+
             player.getInventory().selectedSlot = seedSlot;
+            player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(seedSlot));
 
             player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(
                     Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(dirtPos), Direction.UP, dirtPos, false), 0
             ));
 
             player.getInventory().selectedSlot = previousSlot;
+            player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(previousSlot));
         }
     }
 
@@ -156,6 +158,8 @@ public class Harvester {
 
             if (dirtPos.isWithinDistance(player.getPos(), radius + 2)) {
                 player.getInventory().selectedSlot = seedSlot;
+                player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(seedSlot));
+
                 player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(
                         Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(dirtPos), Direction.UP, dirtPos, false), 0
                 ));
@@ -166,6 +170,7 @@ public class Harvester {
         }
 
         player.getInventory().selectedSlot = previousSlot;
+        player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(previousSlot));
     }
 
     private static int getSeedSlot(ClientPlayerEntity player) {

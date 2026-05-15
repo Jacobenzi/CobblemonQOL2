@@ -70,35 +70,47 @@ public class ModSettings {
     public static boolean xrayShowLapis = false;
     public static boolean xrayShowRedstone = false;
     public static boolean xrayShowCoal = false;
-
+    public static boolean xrayShowQuartz = false;
     // Vanilla ore colors
     public static int xrayDiamondR = 0;
     public static int xrayDiamondG = 255;
     public static int xrayDiamondB = 255;
+
     public static int xrayEmeraldR = 0;
     public static int xrayEmeraldG = 255;
     public static int xrayEmeraldB = 0;
+
     public static int xrayGoldR = 255;
     public static int xrayGoldG = 215;
     public static int xrayGoldB = 0;
+
     public static int xrayIronR = 192;
     public static int xrayIronG = 192;
     public static int xrayIronB = 192;
+
     public static int xrayCoalR = 47;
     public static int xrayCoalG = 47;
     public static int xrayCoalB = 47;
+
     public static int xrayLapisR = 65;
     public static int xrayLapisG = 105;
     public static int xrayLapisB = 225;
+
     public static int xrayRedstoneR = 255;
     public static int xrayRedstoneG = 0;
     public static int xrayRedstoneB = 0;
+
     public static int xrayCopperR = 255;
     public static int xrayCopperG = 140;
     public static int xrayCopperB = 0;
+
     public static int xrayAncientDebrisR = 255;
     public static int xrayAncientDebrisG = 107;
     public static int xrayAncientDebrisB = 0;
+
+    public static int xrayQuartzR = 255;
+    public static int xrayQuartzG = 255;
+    public static int xrayQuartzB = 255;
 
     // Mythic Metals ores (včetně Kyber)
     public static boolean xrayShowKyber = false;

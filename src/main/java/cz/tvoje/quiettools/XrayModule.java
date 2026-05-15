@@ -69,6 +69,10 @@ public class XrayModule {
             addOre(Blocks.DEEPSLATE_COAL_ORE, "coal");
         }
 
+        if (ModSettings.xrayShowQuartz) {
+            targetBlocks.add(Registries.BLOCK.get(new Identifier("minecraft", "nether_quartz_ore")));
+        }
+
         addMythicMetalsOres();
     }
 
