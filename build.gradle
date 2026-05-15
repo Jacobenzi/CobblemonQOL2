@@ -13,6 +13,10 @@ base {
 repositories {
 	mavenCentral()
 	maven { url "https://maven.impactdev.net/repository/development/" }
+
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
@@ -28,6 +32,8 @@ dependencies {
 	modImplementation("com.cobblemon:fabric:${project.cobblemon_version}") {
 		transitive = true
 	}
+	modImplementation name: 'autorun-1.21.X-0.6.0'
+	include name: 'autorun-1.21.X-0.6.0'
 }
 
 processResources {

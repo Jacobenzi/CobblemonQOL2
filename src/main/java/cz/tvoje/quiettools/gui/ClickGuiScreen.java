@@ -148,6 +148,8 @@ public class ClickGuiScreen extends Screen {
     private SliderComponent xrayOpacitySlider;
     private ModuleButton fullbrightButton;
     private ModuleButton xrayTracerButton;
+    private ModuleButton autoMineButton;
+    private ModuleButton legitModeButton;
 
     // Vanilla ores
     private ModuleButton xrayDiamondButton;
@@ -464,6 +466,44 @@ public class ClickGuiScreen extends Screen {
                 "X-Ray Tracer",
                 () -> ModSettings.xrayTracerEnabled,
                 value -> ModSettings.xrayTracerEnabled = value
+        );
+
+        y += 28;
+
+        autoMineButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y, // Pozice se nastaví dynamicky při vykreslování
+                componentWidth,
+                22,
+                "Auto-Mine Bot",
+                () -> ModSettings.autoMineBot,
+                value -> ModSettings.autoMineBot = value
+        );
+
+        y += 28;
+
+        legitModeButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y,
+                componentWidth,
+                22,
+                "Legit Movement",
+                () -> ModSettings.legitMode,
+
+                // TADY JE ZMĚNA: Tohle se provede JEN JEDNOU při kliknutí
+                value -> {
+                    ModSettings.legitMode = value; // Uloží hodnotu do tvého nastavení
+
+                    // Okamžitě předáme nastavení Baritonu
+                    var settings = baritone.api.BaritoneAPI.getSettings();
+                    settings.antiCheatCompatibility.value = value;
+                    settings.blockFreeLook.value = value;
+                    settings.allowParkour.value = value;
+                    settings.smoothLook.value = value;
+
+                    // Přidáme ještě tuhle lahůdku - nutí to bota točit hlavou mnohem organičtěji
+                    settings.randomLooking.value = value ? 0.01 : 0.0;
+                }
         );
 
         y += 28;
@@ -1127,6 +1167,14 @@ public class ClickGuiScreen extends Screen {
             xrayTracerButton.render(context, mouseX, mouseY);
             xrayY += 28;
 
+            autoMineButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            autoMineButton.render(context, mouseX, mouseY);
+            xrayY += 28;
+
+            legitModeButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            legitModeButton.render(context, mouseX, mouseY);
+            xrayY += 28;
+
             xrayRadiusSlider.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayRadiusSlider.render(context, mouseX, mouseY);
             xrayY += 40;
@@ -1493,6 +1541,8 @@ public class ClickGuiScreen extends Screen {
             xrayOpacitySlider.mouseClicked(mouseX, mouseY);
             fullbrightButton.mouseClicked(mouseX, mouseY, button);
             xrayTracerButton.mouseClicked(mouseX, mouseY, button);
+            autoMineButton.mouseClicked(mouseX, mouseY, button);
+            legitModeButton.mouseClicked(mouseX, mouseY, button);
 
             // Vanilla ores
             xrayDiamondButton.mouseClicked(mouseX, mouseY, button);

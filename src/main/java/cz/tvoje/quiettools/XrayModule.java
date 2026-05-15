@@ -18,11 +18,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import baritone.api.BaritoneAPI;
+import baritone.api.pathing.goals.GoalBlock;
+
+
 
 public class XrayModule {
 
     private static final Set<Block> targetBlocks = new HashSet<>();
     private static final Map<Block, String> blockOreIds = new HashMap<>();
+
+    private static long lastBotCommand = 0;
 
     static {
         updateTargetBlocks();
@@ -199,10 +205,9 @@ public class XrayModule {
         }
 
         // =========================================================
-        // NAKRESLENÍ TRACERU K NEJBLIŽŠÍ RUDĚ
+        // 1. NAKRESLENÍ TRACERU
         // =========================================================
-        if (closestPos != null && ModSettings.xrayTracerEnabled) {
-            // Získáme správnou barvu pro tracer
+        if (closestPos != null && cz.tvoje.quiettools.ModSettings.xrayTracerEnabled) {
             int color = getOreColor(closestBlock);
             float rf = ((color >> 16) & 0xFF) / 255f;
             float gf = ((color >> 8) & 0xFF) / 255f;
@@ -211,20 +216,40 @@ public class XrayModule {
             VertexConsumerProvider.Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
             VertexConsumer buffer = consumers.getBuffer(RenderLayer.getLines());
 
-            // Vystřelíme čáru
-            ESPRenderer.drawBlockTracer(
-                    context.matrixStack(),
-                    buffer,
-                    closestPos,
-                    context.camera().getPos(),
-                    rf,
-                    gf,
-                    bf
-            );
-
+            ESPRenderer.drawBlockTracer(context.matrixStack(), buffer, closestPos, context.camera().getPos(), rf, gf, bf);
             consumers.draw();
         }
+
+        // =========================================================
+        // 2. BARITONE AUTOPILOT LOGIKA
+        // =========================================================
+        if (cz.tvoje.quiettools.ModSettings.autoMineBot) {
+
+            // TADY JSME SMAZALI TO SPAMOVÁNÍ NASTAVENÍ!
+
+            var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
+
+            if (closestPos != null) {
+                // A) MÁME CÍL: Pokud bot stojí, pošleme ho tam (s cooldownem)
+                if (!baritone.getPathingBehavior().isPathing() && (System.currentTimeMillis() - lastBotCommand > 1000)) {
+                    baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(closestPos));
+                    lastBotCommand = System.currentTimeMillis();
+                }
+            } else {
+                // B) CÍL ZMIZEL: Bota bezpečně zastavíme
+                if (baritone.getPathingBehavior().isPathing() || baritone.getCustomGoalProcess().isActive()) {
+                    baritone.getPathingBehavior().cancelEverything();
+                }
+            }
+        } else {
+            // C) TLAČÍTKO V MENU JE VYPNUTÉ: Zastavit bota
+            var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
+            if (baritone.getPathingBehavior().isPathing() || baritone.getCustomGoalProcess().isActive()) {
+                baritone.getPathingBehavior().cancelEverything();
+            }
+        }
     }
+
 
     private static void renderOreBox(WorldRenderContext context, BlockPos pos, Block block) {
         MinecraftClient client = MinecraftClient.getInstance();

@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.math.Vec3d;
 
 public class AutoJumpAssist {
 

@@ -60,6 +60,8 @@ public class ModSettings {
     public static int xrayRadius = 64;
     public static int xrayOpacity = 255;
     public static boolean xrayTracerEnabled = true; // Výchozí stav: zapnuto
+    public static boolean autoMineBot = false; // Výchozí stav: vypnuto
+    public static boolean legitMode = true; // Zapnuto jako výchozí pro bezpečí
 
     // Vanilla ores
     public static boolean xrayShowDiamond = false;
