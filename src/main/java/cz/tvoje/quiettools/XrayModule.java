@@ -169,17 +169,60 @@ public class XrayModule {
         BlockPos playerPos = client.player.getBlockPos();
         int radius = Math.min(ModSettings.xrayRadius, 64);
 
+        // Proměnné pro uložení toho absolutně nejbližšího bloku
+        double closestDistanceSq = Double.MAX_VALUE;
+        BlockPos closestPos = null;
+        Block closestBlock = null;
+
+        // Prohledávání okolí
         for (int x = playerPos.getX() - radius; x <= playerPos.getX() + radius; x++) {
             for (int y = playerPos.getY() - radius; y <= playerPos.getY() + radius; y++) {
                 for (int z = playerPos.getZ() - radius; z <= playerPos.getZ() + radius; z++) {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     Block block = world.getBlockState(blockPos).getBlock();
 
+                    // Našli jsme hledanou rudu!
                     if (targetBlocks.contains(block)) {
+                        // 1. Vykreslíme jí klasický box
                         renderOreBox(context, blockPos, block);
+
+                        // 2. Zjistíme, jestli není blíž, než ty předchozí
+                        double distSq = playerPos.getSquaredDistance(blockPos);
+                        if (distSq < closestDistanceSq) {
+                            closestDistanceSq = distSq;
+                            closestPos = blockPos;
+                            closestBlock = block;
+                        }
                     }
                 }
             }
+        }
+
+        // =========================================================
+        // NAKRESLENÍ TRACERU K NEJBLIŽŠÍ RUDĚ
+        // =========================================================
+        if (closestPos != null && ModSettings.xrayTracerEnabled) {
+            // Získáme správnou barvu pro tracer
+            int color = getOreColor(closestBlock);
+            float rf = ((color >> 16) & 0xFF) / 255f;
+            float gf = ((color >> 8) & 0xFF) / 255f;
+            float bf = (color & 0xFF) / 255f;
+
+            VertexConsumerProvider.Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
+            VertexConsumer buffer = consumers.getBuffer(RenderLayer.getLines());
+
+            // Vystřelíme čáru
+            ESPRenderer.drawBlockTracer(
+                    context.matrixStack(),
+                    buffer,
+                    closestPos,
+                    context.camera().getPos(),
+                    rf,
+                    gf,
+                    bf
+            );
+
+            consumers.draw();
         }
     }
 

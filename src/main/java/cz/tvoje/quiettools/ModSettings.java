@@ -59,6 +59,7 @@ public class ModSettings {
     public static boolean xrayEnabled = false;
     public static int xrayRadius = 64;
     public static int xrayOpacity = 255;
+    public static boolean xrayTracerEnabled = true; // Výchozí stav: zapnuto
 
     // Vanilla ores
     public static boolean xrayShowDiamond = false;

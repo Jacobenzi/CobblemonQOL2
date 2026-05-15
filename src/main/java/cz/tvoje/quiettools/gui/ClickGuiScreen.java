@@ -147,6 +147,7 @@ public class ClickGuiScreen extends Screen {
     private SliderComponent xrayRadiusSlider;
     private SliderComponent xrayOpacitySlider;
     private ModuleButton fullbrightButton;
+    private ModuleButton xrayTracerButton;
 
     // Vanilla ores
     private ModuleButton xrayDiamondButton;
@@ -451,6 +452,18 @@ public class ClickGuiScreen extends Screen {
                 "X-Ray",
                 () -> ModSettings.xrayEnabled,
                 value -> ModSettings.xrayEnabled = value
+        );
+
+        y += 28;
+
+        xrayTracerButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y, // Pozici si to vezme automaticky podle aktuálního 'y'
+                componentWidth,
+                22,
+                "X-Ray Tracer",
+                () -> ModSettings.xrayTracerEnabled,
+                value -> ModSettings.xrayTracerEnabled = value
         );
 
         y += 28;
@@ -1110,6 +1123,10 @@ public class ClickGuiScreen extends Screen {
             xrayButton.render(context, mouseX, mouseY);
             xrayY += 28;
 
+            xrayTracerButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayTracerButton.render(context, mouseX, mouseY);
+            xrayY += 28;
+
             xrayRadiusSlider.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayRadiusSlider.render(context, mouseX, mouseY);
             xrayY += 40;
@@ -1475,6 +1492,7 @@ public class ClickGuiScreen extends Screen {
             xrayRadiusSlider.mouseClicked(mouseX, mouseY);
             xrayOpacitySlider.mouseClicked(mouseX, mouseY);
             fullbrightButton.mouseClicked(mouseX, mouseY, button);
+            xrayTracerButton.mouseClicked(mouseX, mouseY, button);
 
             // Vanilla ores
             xrayDiamondButton.mouseClicked(mouseX, mouseY, button);

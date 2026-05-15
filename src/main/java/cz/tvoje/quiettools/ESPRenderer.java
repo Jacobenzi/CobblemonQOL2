@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 
@@ -260,6 +260,46 @@ public class ESPRenderer {
         Vec3d end = targetPos
                 .add(0, entity.getHeight() * 0.5, 0)
                 .subtract(camera);
+
+        Vec3d dir = end.subtract(start).normalize();
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+
+        buffer.vertex(matrix, (float) start.x, (float) start.y, (float) start.z)
+                .color(r, g, b, 1.0f)
+                .normal((float) dir.x, (float) dir.y, (float) dir.z);
+
+        buffer.vertex(matrix, (float) end.x, (float) end.y, (float) end.z)
+                .color(r, g, b, 1.0f)
+                .normal((float) dir.x, (float) dir.y, (float) dir.z);
+    }
+
+    // =============================================================
+    // TRACER PRO BLOKY (X-RAY)
+    // =============================================================
+
+    public static void drawBlockTracer(
+            MatrixStack matrices,
+            VertexConsumer buffer,
+            BlockPos targetBlock,
+            Vec3d camera,
+            float r,
+            float g,
+            float b
+    ) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        float tickDelta = client.getRenderTickCounter().getTickDelta(true);
+
+        Vec3d startRaw;
+
+        if (client.options.getPerspective().isFirstPerson()) {
+            Vec3d lookVec = client.player.getRotationVec(tickDelta);
+            startRaw = camera.add(lookVec.multiply(0.1));
+        } else {
+            startRaw = client.player.getLerpedPos(tickDelta).add(0, client.player.getHeight() * 0.5, 0);
+        }
+
+        Vec3d start = startRaw.subtract(camera);
+        Vec3d end = new Vec3d(targetBlock.getX() + 0.5, targetBlock.getY() + 0.5, targetBlock.getZ() + 0.5).subtract(camera);
 
         Vec3d dir = end.subtract(start).normalize();
         Matrix4f matrix = matrices.peek().getPositionMatrix();

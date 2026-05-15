@@ -1,14 +1,10 @@
 package cz.tvoje.quiettools.movement;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
-import net.minecraft.block.BlockState;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
 
 public class AutoJumpAssist {
 
@@ -16,18 +12,17 @@ public class AutoJumpAssist {
 
     public static void register() {
 
-        ClientTickEvents.END_CLIENT_TICK.register(
+        // ZMĚNA 1: Spouštíme na ZAČÁTKU ticku!
+        // Zkontrolujeme hranu dřív, než nás engine hry reálně posune do propasti.
+        ClientTickEvents.START_CLIENT_TICK.register(
                 client -> tick()
         );
     }
 
     private static void tick() {
 
-        MinecraftClient client =
-                MinecraftClient.getInstance();
-
-        ClientPlayerEntity player =
-                client.player;
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity player = client.player;
 
         if (player == null) {
             return;
@@ -37,82 +32,52 @@ public class AutoJumpAssist {
         // CONDITIONS
         // =====================================================
 
-        if (
-                !cz.tvoje.quiettools.ModSettings.autoJumpAssist
-        ) {
-            return;
-        }
-
-        if (!player.isOnGround()) {
-            return;
-        }
-
-        if (!player.isSprinting()) {
-            return;
-        }
-
-        if (player.isSneaking()) {
-            return;
-        }
-
-        if (player.forwardSpeed <= 0) {
-            return;
-        }
+        if (!cz.tvoje.quiettools.ModSettings.autoJumpAssist) return;
+        if (!player.isOnGround()) return;
+        if (!player.isSprinting()) return;
+        if (player.isSneaking() || player.isSwimming() || player.isCrawling()) return;
+        if (player.forwardSpeed <= 0) return;
 
         // =====================================================
         // COOLDOWN
         // =====================================================
 
-        if (
-                System.currentTimeMillis()
-                        - lastJump
-                        < 150
-        ) {
+        if (System.currentTimeMillis() - lastJump < 150) {
             return;
         }
 
         // =====================================================
-        // FORWARD CHECK
+        // TRUE 4-BLOCK PIXEL-PERFECT CHECK
         // =====================================================
 
-        Vec3d forward =
-                player.getRotationVec(1.0f)
-                        .normalize();
+        // Získáme přesný vektor rychlosti, kterým tě engine zrovna hýbe
+        Vec3d vel = player.getVelocity();
 
-        double checkDistance = 0.42;
+        // Pokud se prakticky nehýbeme, neřešíme hrany
+        if (Math.abs(vel.x) < 0.05 && Math.abs(vel.z) < 0.05) return;
 
-        double checkX =
-                player.getX()
-                        + forward.x * checkDistance;
+        // Hitbox postavy posuneme naprosto PŘESNĚ tam, kde bude tvá postava v dalším ticku.
+        // Žádné hádání vzdálenosti, použijeme čistou fyziku hry.
+        Box futureBox = player.getBoundingBox().offset(vel.x, -0.05, vel.z);
 
-        double checkY =
-                player.getY() - 0.5;
+        Iterable<VoxelShape> collisions = player.getWorld().getBlockCollisions(player, futureBox);
 
-        double checkZ =
-                player.getZ()
-                        + forward.z * checkDistance;
-
-        BlockPos blockPos =
-                BlockPos.ofFloored(
-                        checkX,
-                        checkY,
-                        checkZ
-                );
-
-        BlockState state =
-                player.getWorld()
-                        .getBlockState(blockPos);
+        boolean hasFloor = false;
+        for (VoxelShape shape : collisions) {
+            if (!shape.isEmpty()) {
+                hasFloor = true;
+                break;
+            }
+        }
 
         // =====================================================
-        // EDGE DETECTED
+        // JUMP TRIGGER
         // =====================================================
 
-        if (state.isAir()) {
-
+        // Pokud v dalším ticku opravdu nezbude pod naším přesným stínem ani pixel opory
+        if (!hasFloor) {
             player.jump();
-
-            lastJump =
-                    System.currentTimeMillis();
+            lastJump = System.currentTimeMillis();
         }
     }
 }
