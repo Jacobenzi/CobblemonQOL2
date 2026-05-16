@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.tvoje.quiettools.gui.ClickGuiScreen;
 import cz.tvoje.quiettools.movement.AutoJumpAssist;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.block.Block;
 
 public class QuietTools implements ClientModInitializer {
 
@@ -62,6 +65,55 @@ public class QuietTools implements ClientModInitializer {
                 GLFW.GLFW_KEY_N,
                 "category.betterthirdperson"
         ));
+
+        // 1. Registrace klávesy na prostřední tlačítko myši
+        KeyBinding selectTargetKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "Vybrat Auto-Mine cíl",
+                InputUtil.Type.MOUSE,
+                GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
+                "GodClient" // Kategorie v nastavení ovládání
+        ));
+
+// 2. Kontrola kliknutí každý tick hry
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (selectTargetKey.wasPressed()) {
+
+                // =========================================================
+                // A) ZÁCHRANNÁ BRZDA (Shift + Kolečko)
+                // =========================================================
+                if (client.player != null && client.options.sneakKey.isPressed()) {
+                    cz.tvoje.quiettools.XrayModule.clearDynamicTarget();
+                    cz.tvoje.quiettools.ModSettings.autoMineBot = false;
+                    client.player.sendMessage(Text.literal("§d[GodClient] §cZáchranná brzda! Cíl smazán a bot zastaven."), true);
+                    continue;
+                }
+
+                // =========================================================
+                // B) NORMÁLNÍ VÝBĚR CÍLE (Jen Kolečko)
+                // =========================================================
+                if (client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                    BlockHitResult hitResult = (BlockHitResult) client.crosshairTarget;
+                    Block clickedBlock = client.world.getBlockState(hitResult.getBlockPos()).getBlock();
+
+                    if      (clickedBlock == net.minecraft.block.Blocks.AIR ||
+                            clickedBlock == net.minecraft.block.Blocks.CAVE_AIR ||
+                            clickedBlock == net.minecraft.block.Blocks.VOID_AIR) {
+                        continue;
+                    }
+
+                    // Odešleme blok do X-Raye!
+                    cz.tvoje.quiettools.XrayModule.setDynamicTarget(clickedBlock);
+
+                    // Automaticky zapneme X-Ray a bota
+                    cz.tvoje.quiettools.ModSettings.xrayEnabled = true;
+                    cz.tvoje.quiettools.ModSettings.autoMineBot = true;
+
+                    // Pošleme hráči hezkou zprávu nad hotbar, ať ví, že to funguje
+                    String blockName = clickedBlock.getName().getString();
+                    client.player.sendMessage(Text.literal("§d[GodClient] §fCíl nastaven na: §b" + blockName), true);
+                }
+            }
+        });
 
         // Apricorn ON/OFF
         apricornKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(

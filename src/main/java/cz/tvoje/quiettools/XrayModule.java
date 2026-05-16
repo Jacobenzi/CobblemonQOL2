@@ -28,6 +28,24 @@ public class XrayModule {
 
     private static long lastBotCommand = 0;
 
+    // Proměnná pro dynamický cíl
+    public static Block dynamicTargetBlock = null;
+
+    // Metoda, kterou zavoláme při kliknutí
+    public static void setDynamicTarget(Block block) {
+        if (block == null || block == Blocks.AIR || block == Blocks.CAVE_AIR || block == Blocks.VOID_AIR) {
+            return;
+        }
+        dynamicTargetBlock = block;
+        updateTargetBlocks(); // Znovu načte seznam hledaných bloků
+    }
+
+    // Metoda pro zrušení cíle (Shift + Kolečko)
+    public static void clearDynamicTarget() {
+        dynamicTargetBlock = null;
+        updateTargetBlocks();
+    }
+
     static {
         updateTargetBlocks();
     }
@@ -79,6 +97,11 @@ public class XrayModule {
 
         addMythicMetalsOres();
         addMegaShowdownOres(); // ZDE JE PŘIDANÉ VOLÁNÍ PRO NOVÝ MÓD
+
+        // Přidání dynamického cíle
+        if (dynamicTargetBlock != null) {
+            addOre(dynamicTargetBlock, "dynamic");
+        }
     }
 
     private static void addOre(Block block, String oreId) {
@@ -276,6 +299,7 @@ public class XrayModule {
 
     private static int getOreColor(Block block) {
         String oreId = blockOreIds.getOrDefault(block, "");
+        if (oreId.equals("dynamic")) return 0x00FFFF; // Zářivá azurová barva
 
         // --- ZDE JE PŘIDANÁ BARVA PRO KEYSTONE ORE ---
         if (oreId.equals("keystone")) return 0x9933FF; // Zářivá fialová barva (Hex: #9933FF)
