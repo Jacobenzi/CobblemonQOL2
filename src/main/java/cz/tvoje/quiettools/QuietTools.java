@@ -281,6 +281,15 @@ public class QuietTools implements ClientModInitializer {
 
         });
 
+        // =========================================================
+        // INICIALIZACE NASTAVENÍ BARITONE
+        // =========================================================
+        try {
+            baritone.api.BaritoneAPI.getSettings().allowInventory.value = true;
+        } catch (Exception e) {
+            LOGGER.error("Nepodařilo se aplikovat nastavení Baritone!", e);
+        }
+
         LOGGER.info("Better Third Person loaded.");
     }
 }
