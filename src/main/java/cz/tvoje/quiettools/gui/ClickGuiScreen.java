@@ -177,6 +177,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayRuniteButton;
     private ModuleButton xrayCarmotButton;
     private ModuleButton keystoneOreButton;
+    private ModuleButton xrayPalladiumButton;
 
     private ColorPickerComponent currentColorPicker;
 
@@ -877,6 +878,20 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayCarmotB = value
                 ));
 
+        xrayPalladiumButton = new ModuleButton(0, 0, componentWidth, 22, "Palladium",
+                () -> ModSettings.xrayShowPalladium,
+                v -> {
+                    ModSettings.xrayShowPalladium = v;
+                    XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Carmot",
+                        () -> ModSettings.xrayPalladiumR, () -> ModSettings.xrayPalladiumG, () -> ModSettings.xrayPalladiumB,
+                        value -> ModSettings.xrayPalladiumR = value,
+                        value -> ModSettings.xrayPalladiumG = value,
+                        value -> ModSettings.xrayPalladiumB = value
+                ));
+
 
 
         // =========================================================
@@ -1330,6 +1345,11 @@ public class ClickGuiScreen extends Screen {
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayCarmotR, ModSettings.xrayCarmotG, ModSettings.xrayCarmotB);
             xrayY += 24;
 
+            xrayPalladiumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayPalladiumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayPalladiumR, ModSettings.xrayPalladiumG, ModSettings.xrayPalladiumB);
+            xrayY += 24;
+
             if (currentColorPicker != null) {
                 currentColorPicker.setPosition(panelX + panelWidth - 185, panelY + 36);
                 currentColorPicker.render(context, mouseX, mouseY);
@@ -1595,6 +1615,7 @@ public class ClickGuiScreen extends Screen {
             xrayBanglumButton.mouseClicked(mouseX, mouseY, button);
             xrayRuniteButton.mouseClicked(mouseX, mouseY, button);
             xrayCarmotButton.mouseClicked(mouseX, mouseY, button);
+            xrayPalladiumButton.mouseClicked(mouseX, mouseY, button);
         }
 
         return super.mouseClicked(mouseX, mouseY, button);

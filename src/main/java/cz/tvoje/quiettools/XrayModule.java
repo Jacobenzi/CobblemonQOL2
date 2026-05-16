@@ -173,6 +173,10 @@ public class XrayModule {
                 addBlockIfExists("mythicmetals", "carmot_ore", "carmot");
                 addBlockIfExists("mythicmetals", "deepslate_carmot_ore", "carmot");
             }
+
+            if (ModSettings.xrayShowPalladium) {
+                addBlockIfExists("mythicmetals", "palladium_ore", "palladium");
+            }
         } catch (Exception e) {
             // Mythic Metals není nainstalovaný
         }
@@ -327,6 +331,7 @@ public class XrayModule {
         if (oreId.equals("silver")) return rgb(ModSettings.xraySilverR, ModSettings.xraySilverG, ModSettings.xraySilverB);
         if (oreId.equals("banglum")) return rgb(ModSettings.xrayBanglumR, ModSettings.xrayBanglumG, ModSettings.xrayBanglumB);
         if (oreId.equals("runite")) return rgb(ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
+        if (oreId.equals("palladium")) return rgb(ModSettings.xrayPalladiumR, ModSettings.xrayPalladiumG, ModSettings.xrayPalladiumB);
 
         return 0xFFFFFF;
     }
