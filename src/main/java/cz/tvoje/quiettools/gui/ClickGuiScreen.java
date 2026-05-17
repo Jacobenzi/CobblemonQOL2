@@ -577,7 +577,15 @@ public class ClickGuiScreen extends Screen {
                 22,
                 "Fullbright",
                 () -> ModSettings.fullbrightEnabled,
-                value -> ModSettings.fullbrightEnabled = value
+                value -> {
+                    // 1. Změní hodnotu (ZAPNUTO / VYPNUTO)
+                    ModSettings.fullbrightEnabled = value;
+
+                    // 2. Okamžitě překreslí svět, aby se světlo aplikovalo
+                    if (net.minecraft.client.MinecraftClient.getInstance().worldRenderer != null) {
+                        net.minecraft.client.MinecraftClient.getInstance().worldRenderer.reload();
+                    }
+                }
         );
 
         // Vanilla ores - ALL

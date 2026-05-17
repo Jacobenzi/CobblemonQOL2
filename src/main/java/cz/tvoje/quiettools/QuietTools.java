@@ -56,7 +56,6 @@ public class QuietTools implements ClientModInitializer {
         AutoCatch.register();
         ESPRenderer.register();
         AutoJumpAssist.register();
-        FullbrightModule.register();
         // --- REGISTRACE KLÁVES ---
 
         // Registrace Vivichoke klávesy (N)
@@ -277,6 +276,9 @@ public class QuietTools implements ClientModInitializer {
                 ModSettings.fullbrightEnabled = !ModSettings.fullbrightEnabled;
                 if (client.player != null) {
                     client.player.sendMessage(Text.literal("§e[BTP] Fullbright: " + (ModSettings.fullbrightEnabled ? "§aON" : "§cOFF")), true);
+
+                    // --- PŘIDÁNO: Přinutí hru okamžitě přepočítat světlo a překreslit bloky ---
+                    client.worldRenderer.reload();
                 }
             }
 

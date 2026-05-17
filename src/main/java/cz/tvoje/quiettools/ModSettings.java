@@ -198,7 +198,6 @@ public class ModSettings {
     // =========================================================
 
     public static boolean fullbrightEnabled = false;
-    public static int fullbrightBrightness = 15;
 
     // =========================================================
     // AUTOCATCH + POKEMON SEARCH
