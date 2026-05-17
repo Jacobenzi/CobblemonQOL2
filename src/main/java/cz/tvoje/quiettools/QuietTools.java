@@ -53,6 +53,7 @@ public class QuietTools implements ClientModInitializer {
         );
 
         // Registrace ESP rendereru
+        AutoCatch.register();
         ESPRenderer.register();
         AutoJumpAssist.register();
         FullbrightModule.register();

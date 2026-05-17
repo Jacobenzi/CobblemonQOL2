@@ -1,8 +1,10 @@
 package cz.tvoje.quiettools.gui;
 
+import cz.tvoje.quiettools.AutoCatch;
 import cz.tvoje.quiettools.Harvester;
 import cz.tvoje.quiettools.ModSettings;
 import cz.tvoje.quiettools.QuietTools;
+import cz.tvoje.quiettools.SearchEntry;
 import cz.tvoje.quiettools.XrayModule;
 
 import cz.tvoje.quiettools.gui.components.ColorPickerComponent;
@@ -151,6 +153,13 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton autoMineButton;
     private ModuleButton legitModeButton;
 
+    // Baritone settings submenu
+    private ModuleButton baritoneAutoToolButton;
+    private ModuleButton baritoneAllowInventoryButton;
+    private ModuleButton baritoneSprintButton;
+    private ModuleButton baritoneAllowBreakButton;
+    private ModuleButton baritoneAllowPlaceButton;
+
     // Vanilla ores
     private ModuleButton xrayDiamondButton;
     private ModuleButton xrayEmeraldButton;
@@ -180,6 +189,17 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayPalladiumButton;
 
     private ColorPickerComponent currentColorPicker;
+
+    // =========================================================
+    // AUTOCATCH COMPONENTS
+    // =========================================================
+
+    private ModuleButton autoCatchButton;
+    private ModuleButton resetPatrolButton;
+    private SliderComponent autoCatchRadiusSlider;
+    private TextInputComponent autoCatchBallInput;
+    private TextInputComponent autoCatchPokemonInput;
+    private ModuleButton addPokemonButton;
 
     public ClickGuiScreen() {
         super(Text.literal("BetterThirdPerson"));
@@ -474,13 +494,22 @@ public class ClickGuiScreen extends Screen {
 
         autoMineButton = new ModuleButton(
                 panelX + sidebarWidth + 15,
-                y, // Pozice se nastaví dynamicky při vykreslování
+                y,
                 componentWidth,
                 22,
                 "Auto-Mine Bot",
                 () -> ModSettings.autoMineBot,
-                value -> ModSettings.autoMineBot = value
+                value -> ModSettings.autoMineBot = value,
+                () -> ModSettings.autoMineExpanded,
+                value -> ModSettings.autoMineExpanded = value
         );
+
+        // Baritone settings submenu tlačítka
+        baritoneAutoToolButton      = new ModuleButton(0, 0, componentWidth - 20, 20, " > Auto Tool",      () -> ModSettings.baritoneAutoTool,       v -> { ModSettings.baritoneAutoTool = v;       baritone.api.BaritoneAPI.getSettings().autoTool.value = v; });
+        baritoneAllowInventoryButton = new ModuleButton(0, 0, componentWidth - 20, 20, " > Allow Inventory", () -> ModSettings.baritoneAllowInventory,  v -> { ModSettings.baritoneAllowInventory = v;  baritone.api.BaritoneAPI.getSettings().allowInventory.value = v; });
+        baritoneSprintButton        = new ModuleButton(0, 0, componentWidth - 20, 20, " > Sprint",         () -> ModSettings.baritioneSprint,         v -> { ModSettings.baritioneSprint = v;         baritone.api.BaritoneAPI.getSettings().allowSprint.value = v; });
+        baritoneAllowBreakButton    = new ModuleButton(0, 0, componentWidth - 20, 20, " > Allow Break",    () -> ModSettings.baritoneAllowBreak,      v -> { ModSettings.baritoneAllowBreak = v;      baritone.api.BaritoneAPI.getSettings().allowBreak.value = v; });
+        baritoneAllowPlaceButton    = new ModuleButton(0, 0, componentWidth - 20, 20, " > Allow Place",    () -> ModSettings.baritoneAllowPlace,      v -> { ModSettings.baritoneAllowPlace = v;      baritone.api.BaritoneAPI.getSettings().allowPlace.value = v; });
 
         y += 28;
 
@@ -945,6 +974,56 @@ public class ClickGuiScreen extends Screen {
                 panelX + sidebarWidth + 15, panelY + 300, componentWidth, 18, "Custom B",
                 0, 255, ModSettings.customPokemonB, value -> ModSettings.customPokemonB = value.intValue()
         );
+
+        // =========================================================
+        // AUTOCATCH COMPONENTS
+        // =========================================================
+
+        autoCatchButton = new ModuleButton(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 22,
+                "AutoCatch",
+                () -> ModSettings.autoCatchEnabled,
+                value -> ModSettings.autoCatchEnabled = value
+        );
+
+        resetPatrolButton = new ModuleButton(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 22,
+                "Reset Patrol Center",
+                () -> false,
+                value -> AutoCatch.resetPatrolCenter()
+        );
+
+        autoCatchRadiusSlider = new SliderComponent(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 18,
+                "Patrol Radius", 5, 64, ModSettings.autoCatchPatrolRadius,
+                value -> ModSettings.autoCatchPatrolRadius = value.intValue()
+        );
+
+        autoCatchBallInput = new TextInputComponent(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 20,
+                "Pokeball Item", "cobblemon:ultra_ball",
+                value -> ModSettings.autoCatchBallItem = value
+        );
+        autoCatchBallInput.setValue(ModSettings.autoCatchBallItem);
+
+        autoCatchPokemonInput = new TextInputComponent(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 20,
+                "Pokémon Name", "eevee...",
+                value -> {}
+        );
+
+        addPokemonButton = new ModuleButton(
+                panelX + sidebarWidth + 15, panelY + 40, componentWidth, 22,
+                "+ Pridat Pokemona",
+                () -> false,
+                value -> {
+                    String name = autoCatchPokemonInput.getValue().trim().toLowerCase();
+                    if (!name.isEmpty()) {
+                        ModSettings.searchEntries.add(new SearchEntry(name, 255, 100, 255));
+                        autoCatchPokemonInput.setValue("");
+                    }
+                }
+        );
     }
 
     @Override
@@ -1015,17 +1094,31 @@ public class ClickGuiScreen extends Screen {
         drawCategory(context, Category.MOVEMENT, panelX + 12, catY);
         catY += 22;
         drawCategory(context, Category.XRAY, panelX + 12, catY);
+        catY += 22;
+        drawCategory(context, Category.AUTOCATCH, panelX + 12, catY);
+
+        context.getMatrices().pop();
 
         // =========================================================
-        // SCISSOR
+        // SCISSOR — mimo matrix blok aby nedocházelo k blikání
         // =========================================================
 
-        context.enableScissor(
-                panelX + sidebarWidth,
-                panelY + 30,
-                panelX + panelWidth - 6,
-                panelY + panelHeight - 6
-        );
+        // Vypočítáme skutečné obrazovkové souřadnice po scale animaci
+        float scale = openAnimation;
+        float cx = width / 2f;
+        float cy = height / 2f;
+
+        int scissorX1 = (int)(cx + (panelX + sidebarWidth - cx) * scale);
+        int scissorY1 = (int)(cy + (panelY + 30 - cy) * scale);
+        int scissorX2 = (int)(cx + (panelX + panelWidth - 6 - cx) * scale);
+        int scissorY2 = (int)(cy + (panelY + panelHeight - 6 - cy) * scale);
+
+        context.enableScissor(scissorX1, scissorY1, scissorX2, scissorY2);
+
+        context.getMatrices().push();
+        context.getMatrices().translate(width / 2f, height / 2f, 0);
+        context.getMatrices().scale(openAnimation, openAnimation, 1f);
+        context.getMatrices().translate(-width / 2f, -height / 2f, 0);
 
         // =========================================================
         // CATEGORY COMPONENTS
@@ -1206,6 +1299,16 @@ public class ClickGuiScreen extends Screen {
             autoMineButton.render(context, mouseX, mouseY);
             xrayY += 28;
 
+            // Baritone settings submenu — rozbalí se pravým klikem na Auto-Mine Bot
+            if (ModSettings.autoMineExpanded) {
+                int subX = panelX + sidebarWidth + 35;
+                baritoneAutoToolButton.setPosition(subX, xrayY);       baritoneAutoToolButton.render(context, mouseX, mouseY);       xrayY += 22;
+                baritoneAllowInventoryButton.setPosition(subX, xrayY); baritoneAllowInventoryButton.render(context, mouseX, mouseY); xrayY += 22;
+                baritoneSprintButton.setPosition(subX, xrayY);         baritoneSprintButton.render(context, mouseX, mouseY);         xrayY += 22;
+                baritoneAllowBreakButton.setPosition(subX, xrayY);     baritoneAllowBreakButton.render(context, mouseX, mouseY);     xrayY += 22;
+                baritoneAllowPlaceButton.setPosition(subX, xrayY);     baritoneAllowPlaceButton.render(context, mouseX, mouseY);     xrayY += 28;
+            }
+
             legitModeButton.setPosition(panelX + sidebarWidth + 15, xrayY);
             legitModeButton.render(context, mouseX, mouseY);
             xrayY += 28;
@@ -1356,7 +1459,68 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
+        // =========================================================
+        // AUTOCATCH CATEGORY
+        // =========================================================
+
+        if (selectedCategory == Category.AUTOCATCH) {
+            int acY = (int)(panelY + 40 - scrollOffset);
+            int baseX = panelX + sidebarWidth + 15;
+
+            autoCatchButton.setPosition(baseX, acY);
+            autoCatchButton.render(context, mouseX, mouseY);
+            acY += 28;
+
+            resetPatrolButton.setPosition(baseX, acY);
+            resetPatrolButton.render(context, mouseX, mouseY);
+            acY += 36;
+
+            drawSectionHeader(context, "Patrol", baseX, acY);
+            acY += 24;
+            autoCatchRadiusSlider.setPosition(baseX, acY);
+            autoCatchRadiusSlider.render(context, mouseX, mouseY);
+            acY += 32;
+
+            drawSectionHeader(context, "Pokeball", baseX, acY);
+            acY += 24;
+            autoCatchBallInput.setPosition(baseX, acY);
+            autoCatchBallInput.render(context, mouseX, mouseY);
+            acY += 32;
+
+            drawSectionHeader(context, "Hledani Pokemoni", baseX, acY);
+            acY += 24;
+
+            autoCatchPokemonInput.setPosition(baseX, acY);
+            autoCatchPokemonInput.render(context, mouseX, mouseY);
+            acY += 26;
+
+            addPokemonButton.setPosition(baseX, acY);
+            addPokemonButton.render(context, mouseX, mouseY);
+            acY += 30;
+
+            for (int i = 0; i < ModSettings.searchEntries.size(); i++) {
+                SearchEntry entry = ModSettings.searchEntries.get(i);
+                int entryColor = (255 << 24) | (entry.r << 16) | (entry.g << 8) | entry.b;
+                RenderUtils.drawRoundedRect(context, baseX, acY + 1, 8, 8, 2, entryColor);
+                String label = (entry.enabled ? "§a" : "§7") + entry.name;
+                context.drawText(textRenderer, label, baseX + 14, acY + 1, 0xFFFFFFFF, false);
+                context.drawText(textRenderer, "§c✕", baseX + componentWidth - 10, acY + 1, 0xFFFF5555, false);
+                acY += 14;
+            }
+        }
+
+        // =========================================================
+        // SCROLLBAR
+        // =========================================================
+
         context.disableScissor();
+        context.getMatrices().pop();
+
+        // Scrollbar kreslíme v novém matrix push s animací
+        context.getMatrices().push();
+        context.getMatrices().translate(width / 2f, height / 2f, 0);
+        context.getMatrices().scale(openAnimation, openAnimation, 1f);
+        context.getMatrices().translate(-width / 2f, -height / 2f, 0);
 
         // =========================================================
         // SCROLLBAR
@@ -1381,7 +1545,11 @@ public class ClickGuiScreen extends Screen {
         }
 
         if (selectedCategory == Category.XRAY) {
-            contentHeight = 1040f;
+            contentHeight = ModSettings.autoMineExpanded ? 1150f : 1040f;
+        }
+
+        if (selectedCategory == Category.AUTOCATCH) {
+            contentHeight = 280f + ModSettings.searchEntries.size() * 14f;
         }
 
         maxScroll = Math.max(0, contentHeight - (panelHeight - 40));
@@ -1511,6 +1679,14 @@ public class ClickGuiScreen extends Screen {
             scrollOffset = 0;
         }
 
+        catY += 22;
+
+        if (isHovering(panelX + 8, catY, 60, 14, mouseX, mouseY)) {
+            selectedCategory = Category.AUTOCATCH;
+            targetScrollOffset = 0;
+            scrollOffset = 0;
+        }
+
         if (selectedCategory != Category.XRAY) {
             currentColorPicker = null;
         }
@@ -1521,13 +1697,13 @@ public class ClickGuiScreen extends Screen {
             ivButton.mouseClicked(mouseX, mouseY, button);
             espRadiusSlider.mouseClicked(mouseX, mouseY);
 
-                // CUSTOM POKEMON
-                customPokemonButton.mouseClicked(mouseX, mouseY, button);
-                customPokemonInput.mouseClicked(mouseX, mouseY, button);
-                customPokemonRadiusSlider.mouseClicked(mouseX, mouseY);
-                customPokemonRSlider.mouseClicked(mouseX, mouseY);
-                customPokemonGSlider.mouseClicked(mouseX, mouseY);
-                customPokemonBSlider.mouseClicked(mouseX, mouseY);
+            // CUSTOM POKEMON
+            customPokemonButton.mouseClicked(mouseX, mouseY, button);
+            customPokemonInput.mouseClicked(mouseX, mouseY, button);
+            customPokemonRadiusSlider.mouseClicked(mouseX, mouseY);
+            customPokemonRSlider.mouseClicked(mouseX, mouseY);
+            customPokemonGSlider.mouseClicked(mouseX, mouseY);
+            customPokemonBSlider.mouseClicked(mouseX, mouseY);
         }
 
         if (selectedCategory == Category.FARMING) {
@@ -1589,6 +1765,14 @@ public class ClickGuiScreen extends Screen {
             autoMineButton.mouseClicked(mouseX, mouseY, button);
             legitModeButton.mouseClicked(mouseX, mouseY, button);
 
+            if (ModSettings.autoMineExpanded) {
+                baritoneAutoToolButton.mouseClicked(mouseX, mouseY, button);
+                baritoneAllowInventoryButton.mouseClicked(mouseX, mouseY, button);
+                baritoneSprintButton.mouseClicked(mouseX, mouseY, button);
+                baritoneAllowBreakButton.mouseClicked(mouseX, mouseY, button);
+                baritoneAllowPlaceButton.mouseClicked(mouseX, mouseY, button);
+            }
+
             // Vanilla ores
             xrayDiamondButton.mouseClicked(mouseX, mouseY, button);
             xrayEmeraldButton.mouseClicked(mouseX, mouseY, button);
@@ -1616,6 +1800,32 @@ public class ClickGuiScreen extends Screen {
             xrayRuniteButton.mouseClicked(mouseX, mouseY, button);
             xrayCarmotButton.mouseClicked(mouseX, mouseY, button);
             xrayPalladiumButton.mouseClicked(mouseX, mouseY, button);
+        }
+
+        if (selectedCategory == Category.AUTOCATCH) {
+            autoCatchButton.mouseClicked(mouseX, mouseY, button);
+            resetPatrolButton.mouseClicked(mouseX, mouseY, button);
+            autoCatchRadiusSlider.mouseClicked(mouseX, mouseY);
+            autoCatchBallInput.mouseClicked(mouseX, mouseY, button);
+            autoCatchPokemonInput.mouseClicked(mouseX, mouseY, button);
+            addPokemonButton.mouseClicked(mouseX, mouseY, button);
+
+            // Klik na ✕ = odebrat, klik na jméno = toggle enabled
+            if (button == 0) {
+                int baseX = panelX + sidebarWidth + 15;
+                int acY = (int)(panelY + 40 - scrollOffset) + 220;
+                for (int i = 0; i < ModSettings.searchEntries.size(); i++) {
+                    if (isHovering(baseX + componentWidth - 14, acY, 12, 12, mouseX, mouseY)) {
+                        ModSettings.searchEntries.remove(i);
+                        break;
+                    }
+                    if (isHovering(baseX, acY, componentWidth - 16, 12, mouseX, mouseY)) {
+                        ModSettings.searchEntries.get(i).enabled = !ModSettings.searchEntries.get(i).enabled;
+                        break;
+                    }
+                    acY += 14;
+                }
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -1670,6 +1880,10 @@ public class ClickGuiScreen extends Screen {
             }
         }
 
+        if (selectedCategory == Category.AUTOCATCH) {
+            autoCatchRadiusSlider.mouseReleased();
+        }
+
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -1686,6 +1900,14 @@ public class ClickGuiScreen extends Screen {
         if (selectedCategory == Category.ESP && customPokemonInput != null) {
             return customPokemonInput.charTyped(chr, modifiers);
         }
+        if (selectedCategory == Category.AUTOCATCH) {
+            if (autoCatchBallInput != null && autoCatchBallInput.isFocused()) {
+                return autoCatchBallInput.charTyped(chr, modifiers);
+            }
+            if (autoCatchPokemonInput != null && autoCatchPokemonInput.isFocused()) {
+                return autoCatchPokemonInput.charTyped(chr, modifiers);
+            }
+        }
         return super.charTyped(chr, modifiers);
     }
 
@@ -1694,6 +1916,14 @@ public class ClickGuiScreen extends Screen {
         if (selectedCategory == Category.ESP && customPokemonInput != null) {
             if (customPokemonInput.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
+            }
+        }
+        if (selectedCategory == Category.AUTOCATCH) {
+            if (autoCatchBallInput != null && autoCatchBallInput.isFocused()) {
+                if (autoCatchBallInput.keyPressed(keyCode, scanCode, modifiers)) return true;
+            }
+            if (autoCatchPokemonInput != null && autoCatchPokemonInput.isFocused()) {
+                if (autoCatchPokemonInput.keyPressed(keyCode, scanCode, modifiers)) return true;
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);

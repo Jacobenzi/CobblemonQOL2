@@ -164,4 +164,8 @@ public class TextInputComponent {
         this.value = newValue;
         this.cursorPos = newValue.length();
     }
+
+    public boolean isFocused() {
+        return focused;
+    }
 }

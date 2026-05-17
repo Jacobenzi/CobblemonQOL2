@@ -6,5 +6,6 @@ public enum Category {
     FARMING,
     MISC,
     MOVEMENT,
-    XRAY
+    XRAY,
+    AUTOCATCH
 }

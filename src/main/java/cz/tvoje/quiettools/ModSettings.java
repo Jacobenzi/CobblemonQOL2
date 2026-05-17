@@ -194,4 +194,25 @@ public class ModSettings {
 
     public static boolean fullbrightEnabled = false;
     public static int fullbrightBrightness = 15;
+
+    // =========================================================
+    // AUTOCATCH + POKEMON SEARCH
+    // =========================================================
+
+    public static boolean autoCatchEnabled = false;
+    public static String autoCatchBallItem = "cobblemon:ultra_ball";
+    public static int autoCatchPatrolRadius = 16;
+
+    public static final java.util.List<SearchEntry> searchEntries = new java.util.ArrayList<>();
+
+    // =========================================================
+    // BARITONE SETTINGS
+    // =========================================================
+
+    public static boolean autoMineExpanded = false;
+    public static boolean baritoneAutoTool = false;
+    public static boolean baritoneAllowInventory = false;
+    public static boolean baritioneSprint = true;
+    public static boolean baritoneAllowBreak = true;
+    public static boolean baritoneAllowPlace = false;
 }
