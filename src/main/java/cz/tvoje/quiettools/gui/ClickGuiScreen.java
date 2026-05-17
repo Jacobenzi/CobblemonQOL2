@@ -187,6 +187,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton xrayCarmotButton;
     private ModuleButton keystoneOreButton;
     private ModuleButton xrayPalladiumButton;
+    private ModuleButton xrayUnobtainiumButton;
 
     private ColorPickerComponent currentColorPicker;
 
@@ -914,11 +915,25 @@ public class ClickGuiScreen extends Screen {
                     XrayModule.updateTargetBlocks();
                 },
                 () -> openXrayColorPicker(
-                        "Carmot",
+                        "Palladium",
                         () -> ModSettings.xrayPalladiumR, () -> ModSettings.xrayPalladiumG, () -> ModSettings.xrayPalladiumB,
                         value -> ModSettings.xrayPalladiumR = value,
                         value -> ModSettings.xrayPalladiumG = value,
                         value -> ModSettings.xrayPalladiumB = value
+                ));
+
+        xrayUnobtainiumButton = new ModuleButton(0, 0, componentWidth, 22, "Unobtainium",
+                () -> ModSettings.xrayShowUnobtainium,
+                v -> {
+                    ModSettings.xrayShowUnobtainium = v;
+                    XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Unobtainium",
+                        () -> ModSettings.xrayUnobtainiumR, () -> ModSettings.xrayUnobtainiumG, () -> ModSettings.xrayUnobtainiumB,
+                        value -> ModSettings.xrayUnobtainiumR = value,
+                        value -> ModSettings.xrayUnobtainiumG = value,
+                        value -> ModSettings.xrayUnobtainiumB = value
                 ));
 
 
@@ -1453,6 +1468,11 @@ public class ClickGuiScreen extends Screen {
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayPalladiumR, ModSettings.xrayPalladiumG, ModSettings.xrayPalladiumB);
             xrayY += 24;
 
+            xrayUnobtainiumButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayUnobtainiumButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayUnobtainiumR, ModSettings.xrayUnobtainiumG, ModSettings.xrayUnobtainiumB);
+            xrayY += 24;
+
             if (currentColorPicker != null) {
                 currentColorPicker.setPosition(panelX + panelWidth - 185, panelY + 36);
                 currentColorPicker.render(context, mouseX, mouseY);
@@ -1800,6 +1820,7 @@ public class ClickGuiScreen extends Screen {
             xrayRuniteButton.mouseClicked(mouseX, mouseY, button);
             xrayCarmotButton.mouseClicked(mouseX, mouseY, button);
             xrayPalladiumButton.mouseClicked(mouseX, mouseY, button);
+            xrayUnobtainiumButton.mouseClicked(mouseX, mouseY, button);
         }
 
         if (selectedCategory == Category.AUTOCATCH) {

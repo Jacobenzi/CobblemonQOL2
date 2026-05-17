@@ -177,6 +177,11 @@ public class XrayModule {
             if (ModSettings.xrayShowPalladium) {
                 addBlockIfExists("mythicmetals", "palladium_ore", "palladium");
             }
+
+            if (ModSettings.xrayShowUnobtainium) {
+                addBlockIfExists("mythicmetals", "unobtainium_ore", "unobtainium");
+                addBlockIfExists("mythicmetals", "deepslate_unobtainium_ore", "unobtainium");
+            }
         } catch (Exception e) {
             // Mythic Metals není nainstalovaný
         }
@@ -332,6 +337,8 @@ public class XrayModule {
         if (oreId.equals("banglum")) return rgb(ModSettings.xrayBanglumR, ModSettings.xrayBanglumG, ModSettings.xrayBanglumB);
         if (oreId.equals("runite")) return rgb(ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
         if (oreId.equals("palladium")) return rgb(ModSettings.xrayPalladiumR, ModSettings.xrayPalladiumG, ModSettings.xrayPalladiumB);
+        if (oreId.equals("unobtainium")) return rgb(ModSettings.xrayUnobtainiumR, ModSettings.xrayUnobtainiumG, ModSettings.xrayUnobtainiumB);
+
 
         return 0xFFFFFF;
     }

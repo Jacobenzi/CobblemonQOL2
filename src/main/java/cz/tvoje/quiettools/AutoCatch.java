@@ -26,16 +26,21 @@ import net.minecraft.util.math.Vec3d;
 
 public class AutoCatch {
 
-    private enum State { IDLE, PATROL, CHASE, CATCH }
+    // --- PŘIDÁNO: Nový stav WAIT_CATCH ---
+    private enum State { IDLE, PATROL, CHASE, CATCH, WAIT_CATCH }
 
     private static State state = State.IDLE;
 
-    private static BlockPos patrolCenter  = null;
-    private static BlockPos patrolTarget  = null;
+    private static BlockPos patrolCenter = null;
+    private static BlockPos patrolTarget = null;
     private static PokemonEntity targetEntity = null;
 
-    private static long lastThrow        = 0;
+    private static long lastThrow = 0;
     private static final long THROW_COOLDOWN = 1200;
+
+    // --- PŘIDÁNO: Proměnné pro odpočet čekání ---
+    private static long catchWaitStartTime = 0;
+    private static final long CATCH_WAIT_DURATION = 5000; // 5000 ms = 5 vteřin
 
     private static long patrolArrivalTime = 0;
     private static final long PATROL_WAIT = 1000;
@@ -75,16 +80,18 @@ public class AutoCatch {
         }
 
         PokemonEntity found = findTarget(client);
-        if (found != null && state != State.CATCH) {
+        // UPRAVENO: Nezačne hledat nového cíle, pokud zrovna čekáme (WAIT_CATCH)
+        if (found != null && state != State.CATCH && state != State.WAIT_CATCH) {
             targetEntity = found;
             state = State.CHASE;
         }
 
         switch (state) {
             case PATROL -> tickPatrol(player, goalProcess);
-            case CHASE  -> tickChase(player, goalProcess);
-            case CATCH  -> tickCatch(player, client);
-            case IDLE   -> {}
+            case CHASE -> tickChase(player, goalProcess);
+            case CATCH -> tickCatch(player, client);
+            case WAIT_CATCH -> tickWaitCatch(); // --- PŘIDÁNO: Zpracování čekání ---
+            case IDLE -> {}
         }
     }
 
@@ -127,7 +134,7 @@ public class AutoCatch {
             return;
         }
 
-        Vec3d playerPos  = player.getPos();
+        Vec3d playerPos = player.getPos();
         Vec3d pokemonPos = targetEntity.getPos();
         double horizDist = Math.sqrt(
                 Math.pow(playerPos.x - pokemonPos.x, 2) +
@@ -142,7 +149,7 @@ public class AutoCatch {
 
         if (player.age % 20 == 0) {
             BlockPos targetPos = targetEntity.getBlockPos();
-            BlockPos goalPos   = isWaterBlock(targetPos) ? findWaterSurface(targetPos) : targetPos;
+            BlockPos goalPos = isWaterBlock(targetPos) ? findWaterSurface(targetPos) : targetPos;
             goalProcess.setGoalAndPath(new GoalNear(goalPos, 3));
         }
     }
@@ -161,7 +168,7 @@ public class AutoCatch {
 
         if (System.currentTimeMillis() - lastThrow < THROW_COOLDOWN) return;
 
-        Vec3d playerPos  = player.getPos();
+        Vec3d playerPos = player.getPos();
         Vec3d pokemonPos = targetEntity.getPos();
         double horizDist = Math.sqrt(
                 Math.pow(playerPos.x - pokemonPos.x, 2) +
@@ -197,7 +204,7 @@ public class AutoCatch {
         double dz = pokemonPos.z - player.getZ();
         double horizDist2 = Math.sqrt(dx * dx + dz * dz);
 
-        float yaw   = (float)(Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
+        float yaw = (float)(Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
         float pitch = (float)(-Math.toDegrees(Math.atan2(dy, horizDist2)));
 
         // 1. Nastav rotaci lokálně i na serveru
@@ -216,15 +223,29 @@ public class AutoCatch {
         // 4. Animace ruky
         player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
+        // (Odstraněn jeden duplicitní kód pro návrat itemu)
         player.getInventory().selectedSlot = previousSlot;
         player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(previousSlot));
 
-        player.getInventory().selectedSlot = previousSlot;
-        player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(previousSlot));
-
+        // --- UPRAVENO: Přechod do stavu čekání ---
         lastThrow = System.currentTimeMillis();
         targetEntity = null;
-        state = State.PATROL;
+
+        catchWaitStartTime = System.currentTimeMillis();
+        state = State.WAIT_CATCH; // Zapneme pauzu
+    }
+
+    // =========================================================
+    // WAIT CATCH - Pauza po hodu (PŘIDÁNO)
+    // =========================================================
+
+    private static void tickWaitCatch() {
+        stopBaritone(); // Ujistíme se, že bot stojí na místě
+
+        // Zkontrolujeme, jestli už uběhlo 5 vteřin
+        if (System.currentTimeMillis() - catchWaitStartTime >= CATCH_WAIT_DURATION) {
+            state = State.PATROL; // Návrat k hlídkování
+        }
     }
 
     // =========================================================
@@ -321,9 +342,9 @@ public class AutoCatch {
     public static void resetPatrolCenter() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            patrolCenter  = client.player.getBlockPos();
-            patrolTarget  = null;
-            patrolAngle   = 0;
+            patrolCenter = client.player.getBlockPos();
+            patrolTarget = null;
+            patrolAngle = 0;
         }
     }
 }
