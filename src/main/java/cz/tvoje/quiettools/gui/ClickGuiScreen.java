@@ -203,6 +203,12 @@ public class ClickGuiScreen extends Screen {
     private TextInputComponent autoCatchPokemonInput;
     private ModuleButton addPokemonButton;
 
+    // =========================================================
+    // AUTO BATTLE TOWER COMPONENTS
+    // =========================================================
+    private ModuleButton autoTowerButton;
+    private ModuleButton allowLegendariesButton;
+
     public ClickGuiScreen() {
         super(Text.literal("BetterThirdPerson"));
     }
@@ -749,7 +755,7 @@ public class ClickGuiScreen extends Screen {
                 () -> ModSettings.xrayShowKeystone,
                 value -> {
                     ModSettings.xrayShowKeystone = value;
-                    cz.tvoje.quiettools.XrayModule.updateTargetBlocks();
+                    XrayModule.updateTargetBlocks();
                 },
                 () -> openXrayColorPicker(
                         "Keystone ore",
@@ -1058,6 +1064,25 @@ public class ClickGuiScreen extends Screen {
                     }
                 }
         );
+
+        // =========================================================
+        // BATTLE COMPONENTS
+        // =========================================================
+        autoTowerButton = new ModuleButton(
+                0, 0, componentWidth, 22,
+                "Auto Battle Tower",
+                () -> ModSettings.autoBattleTowerEnabled,
+                value -> ModSettings.autoBattleTowerEnabled = value,
+                () -> ModSettings.autoTowerExpanded,
+                value -> ModSettings.autoTowerExpanded = value
+        );
+
+        allowLegendariesButton = new ModuleButton(
+                0, 0, componentWidth - 20, 20,
+                " > Allow Legendaries",
+                () -> ModSettings.allowLegendaries,
+                value -> ModSettings.allowLegendaries = value
+        );
     }
 
     @Override
@@ -1130,6 +1155,8 @@ public class ClickGuiScreen extends Screen {
         drawCategory(context, Category.XRAY, panelX + 12, catY);
         catY += 22;
         drawCategory(context, Category.AUTOCATCH, panelX + 12, catY);
+        catY += 22;
+        drawCategory(context, Category.BATTLE, panelX + 12, catY);
 
         context.getMatrices().pop();
 
@@ -1562,6 +1589,24 @@ public class ClickGuiScreen extends Screen {
         }
 
         // =========================================================
+        // BATTLE CATEGORY RENDER
+        // =========================================================
+        if (selectedCategory == Category.BATTLE) {
+            int battleY = (int)(panelY + 40 - scrollOffset);
+
+            autoTowerButton.setPosition(panelX + sidebarWidth + 15, battleY);
+            autoTowerButton.render(context, mouseX, mouseY);
+            battleY += 28;
+
+            if (ModSettings.autoTowerExpanded) {
+                int subX = panelX + sidebarWidth + 35;
+                allowLegendariesButton.setPosition(subX, battleY);
+                allowLegendariesButton.render(context, mouseX, mouseY);
+                battleY += 28;
+            }
+        }
+
+        // =========================================================
         // SCROLLBAR
         // =========================================================
 
@@ -1602,6 +1647,10 @@ public class ClickGuiScreen extends Screen {
 
         if (selectedCategory == Category.AUTOCATCH) {
             contentHeight = 280f + ModSettings.searchEntries.size() * 14f;
+        }
+
+        if (selectedCategory == Category.BATTLE) {
+            contentHeight = ModSettings.autoTowerExpanded ? 100f : 60f;
         }
 
         maxScroll = Math.max(0, contentHeight - (panelHeight - 40));
@@ -1735,6 +1784,14 @@ public class ClickGuiScreen extends Screen {
 
         if (isHovering(panelX + 8, catY, 60, 14, mouseX, mouseY)) {
             selectedCategory = Category.AUTOCATCH;
+            targetScrollOffset = 0;
+            scrollOffset = 0;
+        }
+
+        catY += 22;
+
+        if (isHovering(panelX + 8, catY, 60, 14, mouseX, mouseY)) {
+            selectedCategory = Category.BATTLE;
             targetScrollOffset = 0;
             scrollOffset = 0;
         }
@@ -1879,6 +1936,14 @@ public class ClickGuiScreen extends Screen {
                     }
                     acY += 14;
                 }
+            }
+        }
+
+        if (selectedCategory == Category.BATTLE) {
+            autoTowerButton.mouseClicked(mouseX, mouseY, button);
+
+            if (ModSettings.autoTowerExpanded) {
+                allowLegendariesButton.mouseClicked(mouseX, mouseY, button);
             }
         }
 

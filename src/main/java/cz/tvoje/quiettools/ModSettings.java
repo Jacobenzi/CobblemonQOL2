@@ -52,6 +52,11 @@ public class ModSettings {
     public static int guiWidth = 420;
     public static int guiHeight = 260;
 
+    //Auto Battle Tower settings
+    public static boolean autoBattleTowerEnabled = false;
+    public static boolean allowLegendaries = false;
+    public static boolean autoTowerExpanded = false;
+
     // =========================================================
     // X-RAY SETTINGS
     // =========================================================

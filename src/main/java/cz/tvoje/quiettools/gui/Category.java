@@ -7,5 +7,6 @@ public enum Category {
     MISC,
     MOVEMENT,
     XRAY,
-    AUTOCATCH
+    AUTOCATCH,
+    BATTLE
 }
