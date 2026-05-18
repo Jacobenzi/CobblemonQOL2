@@ -3,7 +3,8 @@
   "package": "cz.tvoje.quiettools.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "FullbrightMixin"
+    "FullbrightMixin",
+    "EdgeJumpMixin"
   ],
   "injectors": {
     "defaultRequire": 1

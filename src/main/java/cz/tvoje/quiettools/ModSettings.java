@@ -17,12 +17,12 @@ public class ModSettings {
     public static boolean customPokemonFound = false;
 
     public static boolean autoJumpAssist = false;
+    public static boolean edgeJumpEnabled = false;
 
     public static boolean apricornEnabled = false;
     public static boolean berryEnabled = false;
     public static boolean berryExpanded = false;
     public static boolean vivichokeEnabled = false;
-    public static int harvestRadius = 5;
 
     public static boolean harvestGrepa = false;
     public static boolean harvestPomeg = false;
@@ -61,7 +61,7 @@ public class ModSettings {
     public static int xrayOpacity = 255;
     public static boolean xrayTracerEnabled = true; // Výchozí stav: zapnuto
     public static boolean autoMineBot = false; // Výchozí stav: vypnuto
-    public static boolean legitMode = true; // Zapnuto jako výchozí pro bezpečí
+    public static boolean legitMode = false; // Zapnuto jako výchozí pro bezpečí
 
     // Vanilla ores
     public static boolean xrayShowDiamond = false;

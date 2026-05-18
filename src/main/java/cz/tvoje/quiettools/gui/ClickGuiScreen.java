@@ -97,6 +97,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton shinyButton;
     private ModuleButton ivButton;
     private ModuleButton autoJumpButton;
+    private ModuleButton edgeJumpButton;
     private SliderComponent espRadiusSlider;
 
     // =========================================================
@@ -236,6 +237,16 @@ public class ClickGuiScreen extends Screen {
                 "Auto Jump Assist",
                 () -> ModSettings.autoJumpAssist,
                 value -> ModSettings.autoJumpAssist = value
+        );
+
+        edgeJumpButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y, // Použije už posunuté Y
+                componentWidth,
+                22,
+                "Edge Jump",
+                () -> ModSettings.edgeJumpEnabled,
+                value -> ModSettings.edgeJumpEnabled = value
         );
 
         // =========================================================
@@ -1300,6 +1311,19 @@ public class ClickGuiScreen extends Screen {
                     mouseX,
                     mouseY
             );
+
+            movementY += 26;
+
+            edgeJumpButton.setPosition(
+                    panelX + sidebarWidth + 15,
+                    movementY
+            );
+
+            edgeJumpButton.render(
+                    context,
+                    mouseX,
+                    mouseY
+            );
         }
 
         // =========================================================
@@ -1774,6 +1798,7 @@ public class ClickGuiScreen extends Screen {
 
         if (selectedCategory == Category.MOVEMENT) {
             autoJumpButton.mouseClicked(mouseX, mouseY, button);
+            edgeJumpButton.mouseClicked(mouseX, mouseY, button);
         }
 
         if (selectedCategory == Category.XRAY) {
