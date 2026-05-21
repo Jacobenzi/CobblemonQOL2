@@ -18,11 +18,15 @@ public class ModSettings {
 
     public static boolean autoJumpAssist = false;
     public static boolean edgeJumpEnabled = false;
+    public static boolean BoatControlEnabled = false;
 
     public static boolean apricornEnabled = false;
     public static boolean berryEnabled = false;
     public static boolean berryExpanded = false;
     public static boolean vivichokeEnabled = false;
+    public static boolean leekEnabled = false;
+    public static boolean leekOnlyReplant = false;
+    public static boolean leekExpanded = false;
 
     public static boolean harvestGrepa = false;
     public static boolean harvestPomeg = false;

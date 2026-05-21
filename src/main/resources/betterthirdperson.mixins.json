@@ -5,7 +5,8 @@
   "mixins": [
     "FullbrightMixin",
     "EdgeJumpMixin",
-    "AutoBattleTowerMixin"
+    "AutoBattleTowerMixin",
+    "BoatEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

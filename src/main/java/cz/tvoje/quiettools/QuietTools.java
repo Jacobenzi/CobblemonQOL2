@@ -203,8 +203,8 @@ public class QuietTools implements ClientModInitializer {
 
             // --- Auto Harvest smyčka ---
             if (client.player != null && client.world != null) {
-                // PŘIDÁNO: Sklízeč běží i tehdy, když je zapnutý jen Vivichoke
-                if (ModSettings.apricornEnabled || ModSettings.berryEnabled || ModSettings.vivichokeEnabled) {
+                // OPRAVENO: Sklízeč teď běží i tehdy, když je zapnutý pouze Leek
+                if (ModSettings.apricornEnabled || ModSettings.berryEnabled || ModSettings.vivichokeEnabled || ModSettings.leekEnabled) {
                     if (client.player.age % 10 == 0) {
                         Harvester.harvest(client.player, client.world);
                     }

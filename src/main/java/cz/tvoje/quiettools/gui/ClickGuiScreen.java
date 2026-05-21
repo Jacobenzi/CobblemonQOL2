@@ -98,6 +98,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton ivButton;
     private ModuleButton autoJumpButton;
     private ModuleButton edgeJumpButton;
+    private ModuleButton BoatControlButton;
     private SliderComponent espRadiusSlider;
 
     // =========================================================
@@ -120,6 +121,8 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton hondewButton;
     private ModuleButton qualotButton;
     private ModuleButton kelpsyButton;
+    private ModuleButton leekButton;
+    private ModuleButton leekOnlyReplantButton;
 
     private SliderComponent radiusSlider;
 
@@ -255,6 +258,16 @@ public class ClickGuiScreen extends Screen {
                 value -> ModSettings.edgeJumpEnabled = value
         );
 
+        BoatControlButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y, // Použije už posunuté Y
+                componentWidth,
+                22,
+                "Boat Control",
+                () -> ModSettings.BoatControlEnabled,
+                value -> ModSettings.BoatControlEnabled = value
+        );
+
         // =========================================================
         // ESP
         // =========================================================
@@ -354,6 +367,27 @@ public class ClickGuiScreen extends Screen {
                 "Harvest Vivichoke",
                 () -> ModSettings.vivichokeEnabled,
                 value -> ModSettings.vivichokeEnabled = value
+        );
+
+        y += 28;
+
+        leekButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y,
+                componentWidth,
+                22,
+                "Harvest Leek",
+                () -> ModSettings.leekEnabled,
+                value -> ModSettings.leekEnabled = value,
+                () -> ModSettings.leekExpanded,
+                value -> ModSettings.leekExpanded = value
+        );
+
+        leekOnlyReplantButton = new ModuleButton(
+                0, 0, componentWidth - 20, 20,
+                " > Replant Only Harvested",
+                () -> ModSettings.leekOnlyReplant,
+                value -> ModSettings.leekOnlyReplant = value
         );
 
         y += 40;
@@ -1243,7 +1277,20 @@ public class ClickGuiScreen extends Screen {
 
             vivichokeButton.setPosition(panelX + sidebarWidth + 15, (int)(panelY + currentY - scrollOffset));
             vivichokeButton.render(context, mouseX, mouseY);
-            currentY += 40;
+            currentY += 28;
+
+
+            leekButton.setPosition(panelX + sidebarWidth + 15, (int)(panelY + currentY - scrollOffset));
+            leekButton.render(context, mouseX, mouseY);
+            currentY += 28;
+
+            if (ModSettings.leekExpanded) {
+                leekOnlyReplantButton.setPosition(panelX + sidebarWidth + 35, (int)(panelY + currentY - scrollOffset));
+                leekOnlyReplantButton.render(context, mouseX, mouseY);
+                currentY += 28;
+            }
+
+            currentY += 12;
 
             radiusSlider.setPosition(panelX + sidebarWidth + 15, (int)(panelY + currentY - scrollOffset));
             radiusSlider.render(context, mouseX, mouseY);
@@ -1347,6 +1394,19 @@ public class ClickGuiScreen extends Screen {
             );
 
             edgeJumpButton.render(
+                    context,
+                    mouseX,
+                    mouseY
+            );
+
+            movementY += 26;
+
+            BoatControlButton.setPosition(
+                    panelX + sidebarWidth + 15,
+                    movementY
+            );
+
+            BoatControlButton.render(
                     context,
                     mouseX,
                     mouseY
@@ -1829,6 +1889,11 @@ public class ClickGuiScreen extends Screen {
             }
 
             vivichokeButton.mouseClicked(mouseX, mouseY, button);
+            leekButton.mouseClicked(mouseX, mouseY, button);
+
+            if (ModSettings.leekExpanded) {
+                leekOnlyReplantButton.mouseClicked(mouseX, mouseY, button);
+            }
             radiusSlider.mouseClicked(mouseX, mouseY);
         }
 
@@ -1856,6 +1921,7 @@ public class ClickGuiScreen extends Screen {
         if (selectedCategory == Category.MOVEMENT) {
             autoJumpButton.mouseClicked(mouseX, mouseY, button);
             edgeJumpButton.mouseClicked(mouseX, mouseY, button);
+            BoatControlButton.mouseClicked(mouseX, mouseY, button);
         }
 
         if (selectedCategory == Category.XRAY) {
