@@ -99,6 +99,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton autoJumpButton;
     private ModuleButton edgeJumpButton;
     private ModuleButton BoatControlButton;
+    private ModuleButton ElytraButton;
     private SliderComponent espRadiusSlider;
 
     // =========================================================
@@ -266,6 +267,16 @@ public class ClickGuiScreen extends Screen {
                 "Boat Control",
                 () -> ModSettings.BoatControlEnabled,
                 value -> ModSettings.BoatControlEnabled = value
+        );
+
+        ElytraButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y, // Použije už posunuté Y
+                componentWidth,
+                22,
+                "Elytra Flight",
+                () -> ModSettings.elytraFlightEnabled,
+                value -> ModSettings.elytraFlightEnabled = value
         );
 
         // =========================================================
@@ -1411,7 +1422,22 @@ public class ClickGuiScreen extends Screen {
                     mouseX,
                     mouseY
             );
+
+            movementY += 26;
+
+            ElytraButton.setPosition(
+                    panelX + sidebarWidth + 15,
+                    movementY
+            );
+
+            ElytraButton.render(
+                    context,
+                    mouseX,
+                    mouseY
+            );
         }
+
+
 
         // =========================================================
         // X-RAY CATEGORY
@@ -1922,6 +1948,7 @@ public class ClickGuiScreen extends Screen {
             autoJumpButton.mouseClicked(mouseX, mouseY, button);
             edgeJumpButton.mouseClicked(mouseX, mouseY, button);
             BoatControlButton.mouseClicked(mouseX, mouseY, button);
+            ElytraButton.mouseClicked(mouseX, mouseY, button);
         }
 
         if (selectedCategory == Category.XRAY) {

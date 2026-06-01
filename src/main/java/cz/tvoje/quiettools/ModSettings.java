@@ -19,6 +19,7 @@ public class ModSettings {
     public static boolean autoJumpAssist = false;
     public static boolean edgeJumpEnabled = false;
     public static boolean BoatControlEnabled = false;
+    public static boolean elytraFlightEnabled = false;
 
     public static boolean apricornEnabled = false;
     public static boolean berryEnabled = false;

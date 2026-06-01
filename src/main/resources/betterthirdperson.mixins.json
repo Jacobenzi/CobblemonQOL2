@@ -6,7 +6,8 @@
     "FullbrightMixin",
     "EdgeJumpMixin",
     "AutoBattleTowerMixin",
-    "BoatEntityMixin"
+    "BoatEntityMixin",
+    "ElytraMixin"
   ],
   "injectors": {
     "defaultRequire": 1
