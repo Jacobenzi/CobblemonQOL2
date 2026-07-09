@@ -124,6 +124,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton kelpsyButton;
     private ModuleButton leekButton;
     private ModuleButton leekOnlyReplantButton;
+    private ModuleButton heartyGrainsButton; // PŘIDÁNO
 
     private SliderComponent radiusSlider;
 
@@ -193,6 +194,7 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton keystoneOreButton;
     private ModuleButton xrayPalladiumButton;
     private ModuleButton xrayUnobtainiumButton;
+    private ModuleButton xrayMorkiteButton;
 
     private ColorPickerComponent currentColorPicker;
 
@@ -399,6 +401,19 @@ public class ClickGuiScreen extends Screen {
                 " > Replant Only Harvested",
                 () -> ModSettings.leekOnlyReplant,
                 value -> ModSettings.leekOnlyReplant = value
+        );
+
+        y += 28;
+
+        // PŘIDÁNO: Tlačítko pro Hearty Grains
+        heartyGrainsButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y,
+                componentWidth,
+                22,
+                "Harvest Hearty Grains",
+                () -> ModSettings.heartyGrainsHarvestEnabled,
+                value -> ModSettings.heartyGrainsHarvestEnabled = value
         );
 
         y += 40;
@@ -1006,6 +1021,20 @@ public class ClickGuiScreen extends Screen {
                         value -> ModSettings.xrayUnobtainiumB = value
                 ));
 
+        xrayMorkiteButton = new ModuleButton(0, 0, componentWidth, 22, "Morkite",
+                () -> ModSettings.xrayShowMorkite,
+                v -> {
+                    ModSettings.xrayShowMorkite = v;
+                    XrayModule.updateTargetBlocks();
+                },
+                () -> openXrayColorPicker(
+                        "Morkite",
+                        () -> ModSettings.xrayMorkiteR, () -> ModSettings.xrayMorkiteG, () -> ModSettings.xrayMorkiteB,
+                        value -> ModSettings.xrayMorkiteR = value,
+                        value -> ModSettings.xrayMorkiteG = value,
+                        value -> ModSettings.xrayMorkiteB = value
+                ));
+
 
 
         // =========================================================
@@ -1300,6 +1329,11 @@ public class ClickGuiScreen extends Screen {
                 leekOnlyReplantButton.render(context, mouseX, mouseY);
                 currentY += 28;
             }
+
+            // --- PŘIDÁNO: Hearty Grains Render ---
+            heartyGrainsButton.setPosition(panelX + sidebarWidth + 15, (int)(panelY + currentY - scrollOffset));
+            heartyGrainsButton.render(context, mouseX, mouseY);
+            currentY += 28;
 
             currentY += 12;
 
@@ -1618,6 +1652,11 @@ public class ClickGuiScreen extends Screen {
             drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayUnobtainiumR, ModSettings.xrayUnobtainiumG, ModSettings.xrayUnobtainiumB);
             xrayY += 24;
 
+            xrayMorkiteButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            xrayMorkiteButton.render(context, mouseX, mouseY);
+            drawXrayColorPreview(context, xrayPreviewX, xrayY + 1, ModSettings.xrayMorkiteR, ModSettings.xrayMorkiteG, ModSettings.xrayMorkiteB);
+            xrayY += 24;
+
             if (currentColorPicker != null) {
                 currentColorPicker.setPosition(panelX + panelWidth - 185, panelY + 36);
                 currentColorPicker.render(context, mouseX, mouseY);
@@ -1716,7 +1755,10 @@ public class ClickGuiScreen extends Screen {
         }
 
         if (selectedCategory == Category.FARMING) {
-            contentHeight = ModSettings.berryExpanded ? 320f : 150f;
+            // PŘIDÁNO: Správný výpočet výšky pro novou farmu Hearty Grains
+            contentHeight = 200f; // Základ (Apricorn, Berry, Vivichoke, Leek, Hearty, Slider)
+            if (ModSettings.berryExpanded) contentHeight += 140f;
+            if (ModSettings.leekExpanded) contentHeight += 30f;
         }
 
         if (selectedCategory == Category.MISC) {
@@ -1920,6 +1962,10 @@ public class ClickGuiScreen extends Screen {
             if (ModSettings.leekExpanded) {
                 leekOnlyReplantButton.mouseClicked(mouseX, mouseY, button);
             }
+
+            // --- PŘIDÁNO: Hearty Grains Click ---
+            heartyGrainsButton.mouseClicked(mouseX, mouseY, button);
+
             radiusSlider.mouseClicked(mouseX, mouseY);
         }
 
@@ -2004,6 +2050,7 @@ public class ClickGuiScreen extends Screen {
             xrayCarmotButton.mouseClicked(mouseX, mouseY, button);
             xrayPalladiumButton.mouseClicked(mouseX, mouseY, button);
             xrayUnobtainiumButton.mouseClicked(mouseX, mouseY, button);
+            xrayMorkiteButton.mouseClicked(mouseX, mouseY, button);
         }
 
         if (selectedCategory == Category.AUTOCATCH) {

@@ -205,4 +205,56 @@ public class Harvester {
         }
         return -1;
     }
+    public static void harvestHeartyGrains(ClientPlayerEntity player, World world) {
+        BlockPos playerPos = player.getBlockPos();
+        int currentRadius = Math.min(radius, 10);
+
+        // --- PŘIDÁNO: Dávkový limit pro bezpečnost ---
+        int harvestedThisTick = 0;
+        int maxPerTick = 20; // Zničí 4 rostliny najednou. Pokud by tě server vyhazoval, sniž to na 2 nebo 3.
+
+        for (int x = -currentRadius; x <= currentRadius; x++) {
+            for (int y = -currentRadius; y <= currentRadius; y++) {
+                for (int z = -currentRadius; z <= currentRadius; z++) {
+
+                    BlockPos targetPos = playerPos.add(x, y, z);
+                    Block block = world.getBlockState(targetPos).getBlock();
+
+                    // 1. Zkontrolujeme, jestli je to Hearty Grains
+                    if (Registries.BLOCK.getId(block).toString().equals("cobblemon:hearty_grains")) {
+
+                        // 2. CHYTRÁ KONTROLA: Zkontrolujeme, jestli je pod ní DALŠÍ blok Hearty Grains.
+                        Block blockBelow = world.getBlockState(targetPos.down()).getBlock();
+
+                        if (Registries.BLOCK.getId(blockBelow).toString().equals("cobblemon:hearty_grains")) {
+
+                            MinecraftClient client = MinecraftClient.getInstance();
+                            if (client.getNetworkHandler() != null) {
+
+                                // 3. Pošleme serveru paket o "rozbití"
+                                client.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+                                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, targetPos, Direction.UP
+                                ));
+                                client.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
+                                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, targetPos, Direction.UP
+                                ));
+
+                                // 4. Přidáme animaci ruky
+                                player.swingHand(Hand.MAIN_HAND);
+
+                                // 5. Zvýšíme počítadlo vytěžených rostlin v tomto cyklu
+                                harvestedThisTick++;
+
+                                // Pokud jsme dosáhli limitu (např. 4 rostliny), ukončíme hledání pro teď.
+                                // V dalším pípnutí bota (za 10 ticků hry) se vytěží další várka.
+                                if (harvestedThisTick >= maxPerTick) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

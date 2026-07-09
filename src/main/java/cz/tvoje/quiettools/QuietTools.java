@@ -6,6 +6,12 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +20,7 @@ import cz.tvoje.quiettools.movement.AutoJumpAssist;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.block.Block;
+
 
 public class QuietTools implements ClientModInitializer {
 
@@ -203,10 +210,17 @@ public class QuietTools implements ClientModInitializer {
 
             // --- Auto Harvest smyčka ---
             if (client.player != null && client.world != null) {
-                // OPRAVENO: Sklízeč teď běží i tehdy, když je zapnutý pouze Leek
+                // Sklízeč pro standardní plodiny
                 if (ModSettings.apricornEnabled || ModSettings.berryEnabled || ModSettings.vivichokeEnabled || ModSettings.leekEnabled) {
                     if (client.player.age % 10 == 0) {
                         Harvester.harvest(client.player, client.world);
+                    }
+                }
+
+                // --- PŘIDÁNO: Sklízeč pro Hearty Grains ---
+                if (ModSettings.heartyGrainsHarvestEnabled) {
+                    if (client.player.age % 10 == 0) {
+                        Harvester.harvestHeartyGrains(client.player, client.world);
                     }
                 }
             }
@@ -293,6 +307,51 @@ public class QuietTools implements ClientModInitializer {
             LOGGER.error("Nepodařilo se aplikovat nastavení Baritone!", e);
         }
 
+        // =========================================================
+        // UNIVERZÁLNÍ PŘÍKAZOVÁ ŘÁDKA V GUI (UMÍSTĚNÁ DOLE)
+        // =========================================================
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+
+            if (screen instanceof HandledScreen) {
+
+                // Spočítáme Y pozici: celková výška obrazovky mínus 25 pixelů (takže to bude dole vlevo)
+                int yPos = scaledHeight - 25;
+
+                // Vytvoříme políčko na vypočítané pozici yPos
+                TextFieldWidget commandField = new TextFieldWidget(client.textRenderer, 5, yPos, 150, 20, Text.literal("Příkaz"));
+                commandField.setMaxLength(256);
+
+                // Vytvoříme tlačítko hned vedle na stejné Y pozici
+                ButtonWidget executeButton = ButtonWidget.builder(Text.literal("Odeslat"), (button) -> {
+
+                    String input = commandField.getText();
+
+                    if (!input.isEmpty() && client.getNetworkHandler() != null) {
+                        if (input.startsWith("/")) {
+                            client.getNetworkHandler().sendCommand(input.substring(1));
+                        } else {
+                            client.getNetworkHandler().sendChatMessage(input);
+                        }
+                        commandField.setText("");
+                    }
+
+                }).dimensions(160, yPos, 60, 20).build();
+
+                Screens.getButtons(screen).add(commandField);
+                Screens.getButtons(screen).add(executeButton);
+
+                // Blokování Vanilla kláves při psaní
+                ScreenKeyboardEvents.allowKeyPress(screen).register((scr, key, scancode, modifiers) -> {
+                    if (commandField.isFocused()) {
+                        return false;
+                    }
+                    return true;
+                });
+            }
+        });
+
         LOGGER.info("Better Third Person loaded.");
+
+
     }
 }

@@ -182,6 +182,12 @@ public class XrayModule {
                 addBlockIfExists("mythicmetals", "unobtainium_ore", "unobtainium");
                 addBlockIfExists("mythicmetals", "deepslate_unobtainium_ore", "unobtainium");
             }
+
+            if (ModSettings.xrayShowMorkite) {
+                addBlockIfExists("mythicmetals", "morkite_ore", "morkite");
+                addBlockIfExists("mythicmetals", "deepslate_morkite_ore", "morkite");
+            }
+
         } catch (Exception e) {
             // Mythic Metals není nainstalovaný
         }
@@ -338,7 +344,7 @@ public class XrayModule {
         if (oreId.equals("runite")) return rgb(ModSettings.xrayRuniteR, ModSettings.xrayRuniteG, ModSettings.xrayRuniteB);
         if (oreId.equals("palladium")) return rgb(ModSettings.xrayPalladiumR, ModSettings.xrayPalladiumG, ModSettings.xrayPalladiumB);
         if (oreId.equals("unobtainium")) return rgb(ModSettings.xrayUnobtainiumR, ModSettings.xrayUnobtainiumG, ModSettings.xrayUnobtainiumB);
-
+        if (oreId.equals("morkite")) return rgb(ModSettings.xrayMorkiteR, ModSettings.xrayMorkiteG, ModSettings.xrayMorkiteB);
 
         return 0xFFFFFF;
     }

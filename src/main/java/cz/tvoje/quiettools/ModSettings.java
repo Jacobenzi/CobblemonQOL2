@@ -28,6 +28,7 @@ public class ModSettings {
     public static boolean leekEnabled = false;
     public static boolean leekOnlyReplant = false;
     public static boolean leekExpanded = false;
+    public static boolean heartyGrainsHarvestEnabled = false;
 
     public static boolean harvestGrepa = false;
     public static boolean harvestPomeg = false;
@@ -141,8 +142,13 @@ public class ModSettings {
     public static boolean xrayShowKeystone = false;
     public static boolean xrayShowPalladium = false;
     public static boolean xrayShowUnobtainium = false;
+    public static boolean xrayShowMorkite = false;
 
     // Mythic Metals ore colors
+    public static int xrayMorkiteR = 0;
+    public static int xrayMorkiteG = 153;
+    public static int xrayMorkiteB = 153;
+
     public static int xrayKyberR = 0;
     public static int xrayKyberG = 153;
     public static int xrayKyberB = 255;
