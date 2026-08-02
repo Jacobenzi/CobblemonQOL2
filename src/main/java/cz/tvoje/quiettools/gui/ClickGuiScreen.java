@@ -165,6 +165,8 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton baritoneSprintButton;
     private ModuleButton baritoneAllowBreakButton;
     private ModuleButton baritoneAllowPlaceButton;
+    private ModuleButton baritoneScanDroppedButton;
+    private SliderComponent baritoneDropLoiterSlider;
 
     // Vanilla ores
     private ModuleButton xrayDiamondButton;
@@ -588,7 +590,8 @@ public class ClickGuiScreen extends Screen {
         baritoneSprintButton        = new ModuleButton(0, 0, componentWidth - 20, 20, " > Sprint",         () -> ModSettings.baritioneSprint,         v -> { ModSettings.baritioneSprint = v;         baritone.api.BaritoneAPI.getSettings().allowSprint.value = v; });
         baritoneAllowBreakButton    = new ModuleButton(0, 0, componentWidth - 20, 20, " > Allow Break",    () -> ModSettings.baritoneAllowBreak,      v -> { ModSettings.baritoneAllowBreak = v;      baritone.api.BaritoneAPI.getSettings().allowBreak.value = v; });
         baritoneAllowPlaceButton    = new ModuleButton(0, 0, componentWidth - 20, 20, " > Allow Place",    () -> ModSettings.baritoneAllowPlace,      v -> { ModSettings.baritoneAllowPlace = v;      baritone.api.BaritoneAPI.getSettings().allowPlace.value = v; });
-
+        baritoneScanDroppedButton   = new ModuleButton(0, 0, componentWidth - 20, 20, " > Scan Dropped Items", () -> ModSettings.baritoneMineScanDroppedItems, v -> {ModSettings.baritoneMineScanDroppedItems = v;baritone.api.BaritoneAPI.getSettings().mineScanDroppedItems.value = v;});
+        baritoneDropLoiterSlider = new SliderComponent(0, 0, componentWidth - 20, 18, " > Drop Wait (ms)", 0, 5000, ModSettings.baritoneDropLoiterDuration, v -> {ModSettings.baritoneDropLoiterDuration = v.intValue();baritone.api.BaritoneAPI.getSettings().mineDropLoiterDurationMSThanksLouca.value = v.longValue();});
         y += 28;
 
         legitModeButton = new ModuleButton(
@@ -610,7 +613,7 @@ public class ClickGuiScreen extends Screen {
                     settings.allowParkour.value = value;
                     settings.smoothLook.value = value;
 
-                    // Přidáme ještě tuhle lahůdku - nutí to bota točit hlavou mnohem organičtěji
+                    // nutí to bota točit hlavou mnohem organičtěji
                     settings.randomLooking.value = value ? 0.01 : 0.0;
                 }
         );
@@ -1500,7 +1503,9 @@ public class ClickGuiScreen extends Screen {
                 baritoneAllowInventoryButton.setPosition(subX, xrayY); baritoneAllowInventoryButton.render(context, mouseX, mouseY); xrayY += 22;
                 baritoneSprintButton.setPosition(subX, xrayY);         baritoneSprintButton.render(context, mouseX, mouseY);         xrayY += 22;
                 baritoneAllowBreakButton.setPosition(subX, xrayY);     baritoneAllowBreakButton.render(context, mouseX, mouseY);     xrayY += 22;
-                baritoneAllowPlaceButton.setPosition(subX, xrayY);     baritoneAllowPlaceButton.render(context, mouseX, mouseY);     xrayY += 28;
+                baritoneAllowPlaceButton.setPosition(subX, xrayY);     baritoneAllowPlaceButton.render(context, mouseX, mouseY);     xrayY += 22;
+                baritoneScanDroppedButton.setPosition(subX, xrayY);    baritoneScanDroppedButton.render(context, mouseX, mouseY);    xrayY += 22;
+                baritoneDropLoiterSlider.setPosition(subX, xrayY);     baritoneDropLoiterSlider.render(context, mouseX, mouseY);     xrayY += 28;
             }
 
             legitModeButton.setPosition(panelX + sidebarWidth + 15, xrayY);
@@ -2020,6 +2025,8 @@ public class ClickGuiScreen extends Screen {
                 baritoneSprintButton.mouseClicked(mouseX, mouseY, button);
                 baritoneAllowBreakButton.mouseClicked(mouseX, mouseY, button);
                 baritoneAllowPlaceButton.mouseClicked(mouseX, mouseY, button);
+                baritoneScanDroppedButton.mouseClicked(mouseX, mouseY, button);
+                baritoneDropLoiterSlider.mouseClicked(mouseX, mouseY);
             }
 
             // Vanilla ores
@@ -2136,6 +2143,9 @@ public class ClickGuiScreen extends Screen {
             xrayOpacitySlider.mouseReleased();
             if (currentColorPicker != null) {
                 currentColorPicker.mouseReleased();
+            }
+            if (baritoneDropLoiterSlider != null) {
+                baritoneDropLoiterSlider.mouseReleased();
             }
         }
 

@@ -302,7 +302,25 @@ public class QuietTools implements ClientModInitializer {
         // INICIALIZACE NASTAVENÍ BARITONE
         // =========================================================
         try {
-            baritone.api.BaritoneAPI.getSettings().allowInventory.value = true;
+            var settings = baritone.api.BaritoneAPI.getSettings();
+
+            // Zápis základního chování z ModSettings
+            settings.allowInventory.value = cz.tvoje.quiettools.ModSettings.baritoneAllowInventory;
+            settings.autoTool.value = cz.tvoje.quiettools.ModSettings.baritoneAutoTool;
+            settings.allowSprint.value = cz.tvoje.quiettools.ModSettings.baritioneSprint;
+            settings.allowBreak.value = cz.tvoje.quiettools.ModSettings.baritoneAllowBreak;
+            settings.allowPlace.value = cz.tvoje.quiettools.ModSettings.baritoneAllowPlace;
+            // Nové funkce pro sběr dropnutých itemů
+            settings.mineScanDroppedItems.value = cz.tvoje.quiettools.ModSettings.baritoneMineScanDroppedItems;
+            settings.mineDropLoiterDurationMSThanksLouca.value = (long) cz.tvoje.quiettools.ModSettings.baritoneDropLoiterDuration;
+
+            // Aplikace legit módu
+            settings.antiCheatCompatibility.value = cz.tvoje.quiettools.ModSettings.legitMode;
+            settings.blockFreeLook.value = cz.tvoje.quiettools.ModSettings.legitMode;
+            settings.allowParkour.value = cz.tvoje.quiettools.ModSettings.legitMode;
+            settings.smoothLook.value = cz.tvoje.quiettools.ModSettings.legitMode;
+            settings.randomLooking.value = cz.tvoje.quiettools.ModSettings.legitMode ? 0.01 : 0.0;
+
         } catch (Exception e) {
             LOGGER.error("Nepodařilo se aplikovat nastavení Baritone!", e);
         }

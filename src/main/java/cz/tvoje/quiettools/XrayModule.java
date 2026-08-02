@@ -267,21 +267,30 @@ public class XrayModule {
             var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
 
             if (closestPos != null) {
-                // A) MÁME CÍL: Pokud bot stojí, pošleme ho tam (s cooldownem)
-                if (!baritone.getPathingBehavior().isPathing() && (System.currentTimeMillis() - lastBotCommand > 1000)) {
-                    baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(closestPos));
+                // A) MÁME CÍL: Pokud Baritone zrovna netěží, pošleme ho blok vytěžit
+                if (!baritone.getMineProcess().isActive() && (System.currentTimeMillis() - lastBotCommand > 1000)) {
+
+                    // Zrušíme jakýkoliv předchozí obyčejný pohyb (pokud běžel)
+                    baritone.getPathingBehavior().cancelEverything();
+
+                    // Pošleme příkaz přímo na proces těžby!
+                    // Musíme použít seznam bloků, takže vezmeme ten náš closestBlock
+                    baritone.getMineProcess().mine(new Block[]{closestBlock});
+
                     lastBotCommand = System.currentTimeMillis();
                 }
             } else {
-                // B) CÍL ZMIZEL: Bota bezpečně zastavíme
-                if (baritone.getPathingBehavior().isPathing() || baritone.getCustomGoalProcess().isActive()) {
+                // B) CÍL ZMIZEL: Bezpečné zastavení, pokud už nic v okolí není
+                if (baritone.getMineProcess().isActive() || baritone.getPathingBehavior().isPathing()) {
+                    baritone.getMineProcess().cancel();
                     baritone.getPathingBehavior().cancelEverything();
                 }
             }
         } else {
-            // C) TLAČÍTKO V MENU JE VYPNUTÉ: Zastavit bota
+            // C) TLAČÍTKO V MENU JE VYPNUTÉ: Zastavit vše
             var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
-            if (baritone.getPathingBehavior().isPathing() || baritone.getCustomGoalProcess().isActive()) {
+            if (baritone.getMineProcess().isActive() || baritone.getPathingBehavior().isPathing() || baritone.getCustomGoalProcess().isActive()) {
+                baritone.getMineProcess().cancel();
                 baritone.getPathingBehavior().cancelEverything();
             }
         }

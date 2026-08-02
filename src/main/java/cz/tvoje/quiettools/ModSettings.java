@@ -235,4 +235,6 @@ public class ModSettings {
     public static boolean baritioneSprint = true;
     public static boolean baritoneAllowBreak = true;
     public static boolean baritoneAllowPlace = false;
+    public static boolean baritoneMineScanDroppedItems = false; // Výchozí stav: vypnuto
+    public static int baritoneDropLoiterDuration = 1000; // Počíta se v ms
 }
