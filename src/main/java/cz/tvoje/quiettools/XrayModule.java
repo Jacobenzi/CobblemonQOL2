@@ -270,17 +270,20 @@ public class XrayModule {
                 // A) MÁME CÍL: Pokud Baritone zrovna netěží, pošleme ho blok vytěžit
                 if (!baritone.getMineProcess().isActive() && (System.currentTimeMillis() - lastBotCommand > 1000)) {
 
-                    // Zrušíme jakýkoliv předchozí obyčejný pohyb (pokud běžel)
+                    // Zrušíme jakýkoliv předchozí obyčejný pohyb
                     baritone.getPathingBehavior().cancelEverything();
 
-                    // Pošleme příkaz přímo na proces těžby!
-                    // Musíme použít seznam bloků, takže vezmeme ten náš closestBlock
-                    baritone.getMineProcess().mine(new Block[]{closestBlock});
+                    // PŘEPRACOVANÁ ČÁST:
+                    // Převedeme náš Set všech hledaných bloků (normální i deepslate) na pole
+                    Block[] blocksToMine = targetBlocks.toArray(new Block[0]);
+
+                    // Pošleme Baritonu VŠECHNY zapnuté bloky najednou. On už si sám najde ten nejbližší.
+                    baritone.getMineProcess().mine(blocksToMine);
 
                     lastBotCommand = System.currentTimeMillis();
                 }
             } else {
-                // B) CÍL ZMIZEL: Bezpečné zastavení, pokud už nic v okolí není
+                // B) CÍL ZMIZEL: Bezpečné zastavení
                 if (baritone.getMineProcess().isActive() || baritone.getPathingBehavior().isPathing()) {
                     baritone.getMineProcess().cancel();
                     baritone.getPathingBehavior().cancelEverything();

@@ -167,6 +167,8 @@ public class ClickGuiScreen extends Screen {
     private ModuleButton baritoneAllowPlaceButton;
     private ModuleButton baritoneScanDroppedButton;
     private SliderComponent baritoneDropLoiterSlider;
+    private ModuleButton autoRefuelButton;
+    private SliderComponent autoRefuelBagSlider;
 
     // Vanilla ores
     private ModuleButton xrayDiamondButton;
@@ -616,6 +618,32 @@ public class ClickGuiScreen extends Screen {
                     // nutí to bota točit hlavou mnohem organičtěji
                     settings.randomLooking.value = value ? 0.01 : 0.0;
                 }
+        );
+
+        y += 28;
+
+        autoRefuelButton = new ModuleButton(
+                panelX + sidebarWidth + 15,
+                y,
+                componentWidth,
+                22,
+                "Auto-Refuel Drill",
+                () -> ModSettings.autoRefuelEnabled,
+                value -> ModSettings.autoRefuelEnabled = value
+        );
+
+        y += 28;
+
+        autoRefuelBagSlider = new SliderComponent(
+                panelX + sidebarWidth + 15,
+                y,
+                componentWidth,
+                18,
+                "Source Bag",
+                1, // Min bag
+                10, // Max bag
+                ModSettings.autoRefuelBagNumber,
+                value -> ModSettings.autoRefuelBagNumber = value.intValue()
         );
 
         y += 28;
@@ -1512,6 +1540,14 @@ public class ClickGuiScreen extends Screen {
             legitModeButton.render(context, mouseX, mouseY);
             xrayY += 28;
 
+            autoRefuelButton.setPosition(panelX + sidebarWidth + 15, xrayY);
+            autoRefuelButton.render(context, mouseX, mouseY);
+            xrayY += 28;
+
+            autoRefuelBagSlider.setPosition(panelX + sidebarWidth + 15, xrayY);
+            autoRefuelBagSlider.render(context, mouseX, mouseY);
+            xrayY += 40;
+
             xrayRadiusSlider.setPosition(panelX + sidebarWidth + 15, xrayY);
             xrayRadiusSlider.render(context, mouseX, mouseY);
             xrayY += 40;
@@ -2018,6 +2054,8 @@ public class ClickGuiScreen extends Screen {
             xrayTracerButton.mouseClicked(mouseX, mouseY, button);
             autoMineButton.mouseClicked(mouseX, mouseY, button);
             legitModeButton.mouseClicked(mouseX, mouseY, button);
+            autoRefuelButton.mouseClicked(mouseX, mouseY, button);
+            autoRefuelBagSlider.mouseClicked(mouseX, mouseY);
 
             if (ModSettings.autoMineExpanded) {
                 baritoneAutoToolButton.mouseClicked(mouseX, mouseY, button);
@@ -2141,6 +2179,7 @@ public class ClickGuiScreen extends Screen {
         if (selectedCategory == Category.XRAY) {
             xrayRadiusSlider.mouseReleased();
             xrayOpacitySlider.mouseReleased();
+            autoRefuelBagSlider.mouseReleased();
             if (currentColorPicker != null) {
                 currentColorPicker.mouseReleased();
             }

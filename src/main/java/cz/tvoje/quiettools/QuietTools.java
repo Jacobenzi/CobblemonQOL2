@@ -83,6 +83,7 @@ public class QuietTools implements ClientModInitializer {
 
 // 2. Kontrola kliknutí každý tick hry
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            AutoRefuel.tick();
             while (selectTargetKey.wasPressed()) {
 
                 // =========================================================

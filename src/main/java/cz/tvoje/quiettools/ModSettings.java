@@ -73,6 +73,8 @@ public class ModSettings {
     public static boolean xrayTracerEnabled = true; // Výchozí stav: zapnuto
     public static boolean autoMineBot = false; // Výchozí stav: vypnuto
     public static boolean legitMode = false; // Zapnuto jako výchozí pro bezpečí
+    public static boolean autoRefuelEnabled = false;
+    public static int autoRefuelBagNumber = 1; // Výchozí bag číslo 1
 
     // Vanilla ores
     public static boolean xrayShowDiamond = false;
